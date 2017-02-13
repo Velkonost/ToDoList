@@ -11,7 +11,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -23,7 +22,6 @@ import ru.velkonost.todolist.R;
 import ru.velkonost.todolist.fragments.ColumnsTabsFragmentAdapter;
 import ru.velkonost.todolist.managers.DBHelper;
 
-import static android.os.Build.ID;
 import static ru.velkonost.todolist.fragments.ColumnsTabsFragmentAdapter.last;
 import static ru.velkonost.todolist.managers.Initializatiors.initToolbar;
 import static ru.velkonost.todolist.managers.PhoneDataStorage.loadText;
@@ -62,26 +60,20 @@ public class MainActivity extends AppCompatActivity {
 
         initToolbar(MainActivity.this, toolbar, "To Do List");
 
-        if (checkCookieId()) {
+        if (!checkCookieId()) {
 
-
-            Log.i("KEKE", String.valueOf(123));
-
-        } else {
-
-            saveText(MainActivity.this, ID, "ok");
+            saveText(MainActivity.this, "exist", "ok");
 
             ContentValues cvColumn = new ContentValues();
             ContentValues cvTask = new ContentValues();
 
             SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-//            db.delete("columns", null, null);
-//            db.delete("task", null, null);
+
 
             db.execSQL("create table columns ("
                     + "id integer primary key autoincrement,"
-                    + "name text," + ");");
+                    + "name text" + ");");
 
             db.execSQL("create table task ("
                     + "id integer primary key autoincrement,"
@@ -266,7 +258,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean checkCookieId() {
-        return loadText(MainActivity.this, ID).length() != 0;
+        return loadText(MainActivity.this, "exist").length() != 0;
     }
 
 }

@@ -1,7 +1,9 @@
 package ru.velkonost.todolist.activities;
 
+import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -40,8 +42,8 @@ public class TaskActivity extends AppCompatActivity {
 
     private TextView viewDescription;
 
-    private String name;
-    private String description;
+    private String name = "";
+    private String description = "";
     private boolean isDone;
 
     private TextView isDoneText;
@@ -97,7 +99,7 @@ public class TaskActivity extends AppCompatActivity {
             isDone = c.getInt(doneTaskIndex) == 1;
             description = c.getString(descriptionTaskIndex);
 
-            setText(description);
+            if (description == null) description = " ";
 
         } else
             Log.d("myLogs", "0 rows");
@@ -131,17 +133,17 @@ public class TaskActivity extends AppCompatActivity {
         ((TextView) findViewById(R.id.taskDescription))
                 .setText(
                         Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
-                                ? Html.fromHtml(text,
+                                ? Html.fromHtml(description,
                                 Html.FROM_HTML_MODE_LEGACY)
-                                : Html.fromHtml(text)
+                                : Html.fromHtml(description)
                 );
 
         ((EditText) findViewById(R.id.editTaskDescription))
                 .setText(
                         Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
-                                ? Html.fromHtml(text,
+                                ? Html.fromHtml(description,
                                 Html.FROM_HTML_MODE_LEGACY)
-                                : Html.fromHtml(text)
+                                : Html.fromHtml(description)
                 );
 
 
@@ -170,7 +172,7 @@ public class TaskActivity extends AppCompatActivity {
 
 
                 menu.findItem(R.id.action_settings).setVisible(false);
-                menu.findItem(R.id.action_move).setVisible(false);
+                menu.findItem(R.id.action_delete).setVisible(false);
 
                 menu.findItem(R.id.action_agree).setVisible(true);
 
@@ -188,7 +190,7 @@ public class TaskActivity extends AppCompatActivity {
                         editCardName.setVisibility(View.INVISIBLE);
 
                         menu.findItem(R.id.action_settings).setVisible(true);
-                        menu.findItem(R.id.action_move).setVisible(true);
+                        menu.findItem(R.id.action_delete).setVisible(true);
 
                         menu.findItem(R.id.action_agree).setVisible(false);
 
@@ -213,28 +215,40 @@ public class TaskActivity extends AppCompatActivity {
 
 
                 break;
-//            case R.id.action_move:
-//
-//                popupWindowColumns.setOnDismissListener(new PopupWindow.OnDismissListener() {
-//                    @Override
-//                    public void onDismiss() {
-//                        if (Depository.isRefreshPopup())
-//                            changeActivityCompat(BoardCardActivity.this);
-//                        Depository.setRefreshPopup(false);
-//
-//                    }
-//                });
-//
-//
-//                popupWindowColumns.setTouchable(true);
-//                popupWindowColumns.setFocusable(true);
-//                popupWindowColumns.setBackgroundDrawable(new ColorDrawable(getResources()
-//                        .getColor(android.R.color.transparent)));
-//                popupWindowColumns.setOutsideTouchable(true);
-//
-//                popupWindowColumns.showAtLocation(popupViewColumns, Gravity.CENTER, 0, 0);
-//
-//                break;
+            case R.id.action_delete:
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(TaskActivity.this);
+                builder.setTitle("Удаление задачи")
+                        .setMessage("Вы уверены?")
+//                .setIcon(R.drawable.ic_android_cat) МОЖНО ДОБАВИТЬ ИКОНКУ!
+                        .setCancelable(false)
+                        .setNegativeButton("Нет",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.cancel();
+                                    }
+                                })
+                        .setPositiveButton("Да", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+
+                                dbHelper = new DBHelper(TaskActivity.this);
+                                ContentValues cv = new ContentValues();
+                                SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+                                db.delete("task",
+                                        "id = ?",
+                                        new String[] {String.valueOf(taskId)});
+                                dbHelper.close();
+
+                                TaskActivity.this.startActivity(new Intent(TaskActivity.this,
+                                        MainActivity.class));
+
+                            }
+                        });
+                AlertDialog alert = builder.create();
+                alert.show();
+
+                break;
         }
 
         return super.onOptionsItemSelected(item);

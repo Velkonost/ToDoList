@@ -8,9 +8,9 @@
         android:title="Настройки"
         app:showAsAction="never"/>
     <item
-        android:id="@+id/action_move"
+        android:id="@+id/action_delete"
         android:orderInCategory="100"
-        android:title="Переместить"
+        android:title="Удалить"
         app:showAsAction="never"/>
     <item
         android:id="@+id/action_agree"
