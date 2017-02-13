@@ -1,8 +1,7 @@
 package ru.velkonost.todolist.activities;
 
-import android.content.Context;
+import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -13,6 +12,11 @@ import android.view.MenuItem;
 
 import ru.velkonost.todolist.R;
 import ru.velkonost.todolist.fragments.ColumnsTabsFragmentAdapter;
+import ru.velkonost.todolist.managers.DBHelper;
+
+import static android.os.Build.ID;
+import static ru.velkonost.todolist.managers.PhoneDataStorage.loadText;
+import static ru.velkonost.todolist.managers.PhoneDataStorage.saveText;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -24,6 +28,10 @@ public class MainActivity extends AppCompatActivity {
 
     private TabLayout tabLayout;
 
+    private DBHelper dbHelper;
+
+    final String LOG_TAG = "myLogs";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,9 +40,31 @@ public class MainActivity extends AppCompatActivity {
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
 
+        dbHelper = new DBHelper(this);
 
         initToolbar(MainActivity.this, toolbar, "To Do List");
         initTabs();
+
+        if (checkCookieId()) {
+
+
+
+        } else {
+            saveText(MainActivity.this, ID, "ok");
+
+            ContentValues cv = new ContentValues();
+            SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+            Log.d(LOG_TAG, "--- Insert in mytable: ---");
+            // подготовим данные для вставки в виде пар: наименование столбца - значение
+
+            cv.put("name", "To do");
+            cv.put("id", 1);
+            // вставляем запись и получаем ее ID
+            long rowID = db.insert("columns", null, cv);
+            Log.d(LOG_TAG, "row inserted, ID = " + rowID);
+
+        }
     }
 
     public static void initToolbar(AppCompatActivity activity, Toolbar toolbar, String title) {
@@ -68,27 +98,8 @@ public class MainActivity extends AppCompatActivity {
             tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
     }
 
-    class DBHelper extends SQLiteOpenHelper {
-
-        public DBHelper(Context context) {
-            // конструктор суперкласса
-            super(context, "myDB", null, 1);
-        }
-
-        @Override
-        public void onCreate(SQLiteDatabase db) {
-            Log.d("LOG_DB", "--- onCreate database ---");
-            // создаем таблицу с полями
-            db.execSQL("create table mytable ("
-                    + "id integer primary key autoincrement,"
-                    + "name text,"
-                    + "email text" + ");");
-        }
-
-        @Override
-        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
-        }
+    private boolean checkCookieId() {
+        return loadText(MainActivity.this, ID).length() != 0;
     }
 
 }
