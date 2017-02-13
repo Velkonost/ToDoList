@@ -43,17 +43,28 @@ public class MainActivity extends AppCompatActivity {
         dbHelper = new DBHelper(this);
 
         initToolbar(MainActivity.this, toolbar, "To Do List");
-        initTabs();
 
         if (checkCookieId()) {
 
 
+            Log.i("KEKE", String.valueOf(123));
 
         } else {
             saveText(MainActivity.this, ID, "ok");
 
             ContentValues cv = new ContentValues();
             SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+
+            db.execSQL("create table columns ("
+                    + "id integer primary key autoincrement,"
+                    + "name text," + ");");
+
+            db.execSQL("create table tasks ("
+                    + "id integer primary key autoincrement,"
+                    + "name text,"
+                    + "description text"
+                    + "done integer" + ");");
 
             Log.d(LOG_TAG, "--- Insert in mytable: ---");
             // подготовим данные для вставки в виде пар: наименование столбца - значение
@@ -62,9 +73,14 @@ public class MainActivity extends AppCompatActivity {
             cv.put("id", 1);
             // вставляем запись и получаем ее ID
             long rowID = db.insert("columns", null, cv);
-            Log.d(LOG_TAG, "row inserted, ID = " + rowID);
+            Log.i(LOG_TAG, "row inserted, ID = " + rowID);
 
         }
+
+        dbHelper.close();
+
+        initTabs();
+
     }
 
     public static void initToolbar(AppCompatActivity activity, Toolbar toolbar, String title) {

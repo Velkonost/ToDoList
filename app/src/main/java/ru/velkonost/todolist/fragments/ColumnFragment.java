@@ -1,6 +1,9 @@
 package ru.velkonost.todolist.fragments;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,6 +18,7 @@ import java.util.List;
 
 import ru.velkonost.todolist.R;
 import ru.velkonost.todolist.adapters.TaskListAdapter;
+import ru.velkonost.todolist.managers.DBHelper;
 import ru.velkonost.todolist.models.Task;
 
 public class ColumnFragment extends AbstractTabFragment{
@@ -29,6 +33,8 @@ public class ColumnFragment extends AbstractTabFragment{
 
     private List<Task> data;
     private ArrayList<String> cids;
+
+    private DBHelper dbHelper;
 
     public static ColumnFragment getInstance(Context context, int columnId, String columnName) {
         Bundle args = new Bundle();
@@ -111,9 +117,13 @@ public class ColumnFragment extends AbstractTabFragment{
 //            }
 //        });
 
-        for (int i = 0; i < 2; i++) {
+        dbHelper = new DBHelper(context);
+        ContentValues cv = new ContentValues();
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-//            JSONObject columnInfo = dataJsonObj.getJSONObject(cids.get(i));
+        Cursor c = db.query("tasks", null, null, null, null, null, null);
+
+        for (int i = 0; i < 2; i++) {
 
             data.add(new Task(
                    i, columnId, i, "Task" + i, "uerhwoibu", false
