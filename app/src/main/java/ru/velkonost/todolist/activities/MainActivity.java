@@ -12,6 +12,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
@@ -42,6 +44,11 @@ public class MainActivity extends AppCompatActivity {
     final String LOG_TAG = "myLogs";
 
     private String columnName;
+
+    private String currentColumnName;
+    private String prevCurrentColumnName;
+
+    private int currentColumnPosition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,6 +112,12 @@ public class MainActivity extends AppCompatActivity {
         initTabs();
 
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_column, menu);
+        return true;
     }
 
     private void initTabs() {
@@ -189,6 +202,70 @@ public class MainActivity extends AppCompatActivity {
 
         if (adapter.getCount() < 4) tabLayout.setTabMode(TabLayout.MODE_FIXED);
         else tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getGroupId();
+
+        switch (id){
+            case 0:
+
+                currentColumnName = tabLayout.getTabAt(viewPager.getCurrentItem()).getText().toString();
+                currentColumnPosition = viewPager.getCurrentItem() + 1;
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("Изменить название колонки");
+
+                final EditText inputName = new EditText(MainActivity.this);
+
+                inputName.setText(currentColumnName);
+                inputName.setInputType(InputType.TYPE_CLASS_TEXT);
+
+                builder.setView(inputName)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                prevCurrentColumnName = currentColumnName;
+                                currentColumnName = inputName.getText().toString();
+
+                                if (currentColumnName.length() != 0) {
+
+//                                    ChangeColumnSettings changeColumnSettings = new ChangeColumnSettings();
+//                                    changeColumnSettings.execute();
+
+                                    dbHelper = new DBHelper(MainActivity.this);
+                                    ContentValues cv = new ContentValues();
+                                    SQLiteDatabase db = dbHelper.getWritableDatabase();
+                                    cv.put("name", currentColumnName);
+
+                                    db.update("columns", cv, "name = ?", new String[] {prevCurrentColumnName});
+                                    dbHelper.close();
+
+                                    Intent intent = new Intent(MainActivity.this,
+                                            MainActivity.class);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    MainActivity.this.startActivity(intent);
+                                    finish();
+
+                                } else dialog.cancel();
+
+                            }
+                        })
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        });
+
+
+                AlertDialog alert = builder.create();
+                alert.show();
+
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private boolean checkCookieId() {
