@@ -2,22 +2,30 @@ package ru.velkonost.todolist.fragments;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.InputType;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import ru.velkonost.todolist.R;
+import ru.velkonost.todolist.activities.MainActivity;
 import ru.velkonost.todolist.adapters.TaskListAdapter;
 import ru.velkonost.todolist.managers.DBHelper;
 import ru.velkonost.todolist.models.Task;
@@ -52,72 +60,89 @@ public class ColumnFragment extends AbstractTabFragment{
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(LAYOUT, container, false);
 
         data = new ArrayList<>();
         cids = new ArrayList<>();
 
-//        FloatingActionButton addCardButton = (FloatingActionButton) view.findViewById(R.id.btnAddCard);
-//        addCardButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                LinearLayout layout = new LinearLayout(context);
-//                layout.setOrientation(LinearLayout.VERTICAL);
-//
-//                LinearLayout.LayoutParams  params =
-//                        new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-//                                ViewGroup.LayoutParams.WRAP_CONTENT);
-//                params.setMargins(0, dp2px(20), 0, dp2px(20));
-//
-//                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-//                builder.setTitle("Title");
-//
-//                final EditText inputName = new EditText(context);
-//                inputName.setLayoutParams(params);
-//
-//                inputName.setHint("Enter card's name...");
-//                inputName.setInputType(InputType.TYPE_CLASS_TEXT);
-//                layout.addView(inputName);
-//
-//                final EditText inputDesc = new EditText(context);
-//                inputDesc.setLayoutParams(params);
-//
-//                inputDesc.setHint("Enter card's description...");
-//                layout.addView(inputDesc);
-//
-//
-//                builder.setView(layout)
-//
-//                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-//                            @Override
-//                            public void onClick(DialogInterface dialog, int which) {
-//                                cardName = inputName.getText().toString();
-//                                cardDescription = inputDesc.getText().toString();
-//
-//                                if (cardName.length() != 0) {
-//
-//                                    AddCard addCard = new AddCard();
-//                                    addCard.execute();
-//
-//                                    changeActivityCompat(getActivity());
-//
-//                                } else dialog.cancel();
-//
-//                            }
-//                        })
-//                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-//                            @Override
-//                            public void onClick(DialogInterface dialog, int which) {
-//                                dialog.cancel();
-//                            }
-//                        });
-//
-//
-//                AlertDialog alert = builder.create();
-//                alert.show();
-//            }
-//        });
+        FloatingActionButton addCardButton = (FloatingActionButton) view.findViewById(R.id.btnAddCard);
+        addCardButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                LinearLayout layout = new LinearLayout(context);
+                layout.setOrientation(LinearLayout.VERTICAL);
+
+                LinearLayout.LayoutParams  params =
+                        new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                                ViewGroup.LayoutParams.WRAP_CONTENT);
+                params.setMargins(0, dp2px(20), 0, dp2px(20));
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle("Добавить задачу");
+
+                final EditText inputName = new EditText(context);
+                inputName.setLayoutParams(params);
+
+                inputName.setHint("Введите название...");
+                inputName.setInputType(InputType.TYPE_CLASS_TEXT);
+                layout.addView(inputName);
+
+                final EditText inputDesc = new EditText(context);
+                inputDesc.setLayoutParams(params);
+
+                inputDesc.setHint("Enter card's description...");
+                layout.addView(inputDesc);
+
+
+                builder.setView(layout)
+
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                cardName = inputName.getText().toString();
+                                cardDescription = inputDesc.getText().toString();
+
+                                if (cardName.length() != 0) {
+
+                                    dbHelper = new DBHelper(context);
+
+                                    ContentValues cvTask = new ContentValues();
+
+                                    SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+                                    cvTask.put("name", cardName);
+                                    cvTask.put("columnId", columnId);
+                                    cvTask.put("done", 0);
+                                    cvTask.put("description", cardDescription);
+
+                                    db.insert("task", null, cvTask);
+
+                                    dbHelper.close();
+
+                                    Intent intent = new Intent(context,
+                                            MainActivity.class);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                                    context.startActivity(intent);
+                                    getActivity().finish();
+
+                                } else dialog.cancel();
+
+                            }
+                        })
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        });
+
+
+                AlertDialog alert = builder.create();
+                alert.show();
+            }
+        });
 
         dbHelper = new DBHelper(context);
         ContentValues cv = new ContentValues();
