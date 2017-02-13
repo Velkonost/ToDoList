@@ -31,6 +31,7 @@ public class ColumnsTabsFragmentAdapter extends FragmentPagerAdapter {
 
     @Override
     public CharSequence getPageTitle(int position) {
+        Log.i("KEKE", String.valueOf(position));
         return tabs.get(position).getTitle();
     }
 
@@ -58,11 +59,15 @@ public class ColumnsTabsFragmentAdapter extends FragmentPagerAdapter {
 
         if (c.moveToFirst()) {
 
+
             // определяем номера столбцов по имени в выборке
             int idColIndex = c.getColumnIndex("id");
             int nameColIndex = c.getColumnIndex("name");
 
             do {
+
+
+
                 // получаем значения по номерам столбцов и пишем все в лог
                 Log.d("myLogs",
                         "ID = " + c.getInt(idColIndex) +
@@ -73,12 +78,16 @@ public class ColumnsTabsFragmentAdapter extends FragmentPagerAdapter {
 
                 // переход на следующую строку
                 // а если следующей нет (текущая - последняя), то false - выходим из цикла
+
+                last = i;
+                i ++;
             } while (c.moveToNext());
         } else
             Log.d("myLogs", "0 rows");
         c.close();
         dbHelper.close();
 
-        tabs.put(i + 1, AddColumnFragment.getInstance(context));
+
+        tabs.put(i, AddColumnFragment.getInstance(context));
     }
 }

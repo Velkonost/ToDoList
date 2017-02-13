@@ -44,6 +44,7 @@ public class ColumnFragment extends AbstractTabFragment{
         fragment.setArguments(args);
         fragment.setContext(context);
         fragment.setColumnId(columnId);
+
         fragment.setTitle(columnName);
 
         return fragment;

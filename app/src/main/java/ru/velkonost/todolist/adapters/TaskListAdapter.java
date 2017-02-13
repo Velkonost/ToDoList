@@ -2,6 +2,7 @@ package ru.velkonost.todolist.adapters;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import ru.velkonost.todolist.R;
+import ru.velkonost.todolist.activities.TaskActivity;
 import ru.velkonost.todolist.managers.DBHelper;
 import ru.velkonost.todolist.models.Task;
 
@@ -23,6 +25,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskLi
     private Context mContext;
 
     private DBHelper dbHelper;
+
 
     public TaskListAdapter(List<Task> data, Context mContext) {
         this.data = data;
@@ -46,6 +49,18 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskLi
 
         if (holder.isDone) holder.imageDone.setImageResource(R.mipmap.ic_checkbox_marked);
         else holder.imageDone.setImageResource(R.mipmap.ic_checkbox_blank_outline);
+
+        holder.mCardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent intent = new Intent(mContext, TaskActivity.class);
+                intent.putExtra("id", item.getId());
+
+                mContext.startActivity(intent);
+
+            }
+        });
 //
 //        final int id = item.getId();
 //
@@ -92,15 +107,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskLi
                     cv.put("done", 0);
                 }
 
-
-// Помещаем значение "Clever" в колонку DESCRIPTION
-
-// Обновляем колонку DESCRIPTION с новым значением "Clever"
-// в таблице WHERE NAME = "Barsik"
-                db.update("task",
-                        cv,
-                        "id = ?",
-                        new String[] {String.valueOf(item.getId())});
+                db.update("task", cv, "id = ?", new String[] {String.valueOf(item.getId())});
                 dbHelper.close();
             }
         });
@@ -123,6 +130,7 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskLi
         public TaskListViewHolder(View itemView) {
             super(itemView);
 
+            mCardView = (CardView) itemView.findViewById(R.id.cardView);
             title = (TextView) itemView.findViewById(R.id.title);
             imageDone = (ImageView) itemView.findViewById(R.id.checkbox_done);
 

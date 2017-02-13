@@ -1,20 +1,29 @@
 package ru.velkonost.todolist.activities;
 
 import android.content.ContentValues;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.util.Log;
-import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 
 import ru.velkonost.todolist.R;
 import ru.velkonost.todolist.fragments.ColumnsTabsFragmentAdapter;
 import ru.velkonost.todolist.managers.DBHelper;
 
 import static android.os.Build.ID;
+import static ru.velkonost.todolist.fragments.ColumnsTabsFragmentAdapter.last;
+import static ru.velkonost.todolist.managers.Initializatiors.initToolbar;
 import static ru.velkonost.todolist.managers.PhoneDataStorage.loadText;
 import static ru.velkonost.todolist.managers.PhoneDataStorage.saveText;
 
@@ -31,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
     private DBHelper dbHelper;
 
     final String LOG_TAG = "myLogs";
+
+    private String columnName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
             Log.i("KEKE", String.valueOf(123));
 
         } else {
+
             saveText(MainActivity.this, ID, "ok");
 
             ContentValues cvColumn = new ContentValues();
@@ -57,6 +69,8 @@ public class MainActivity extends AppCompatActivity {
 
             SQLiteDatabase db = dbHelper.getWritableDatabase();
 
+//            db.delete("columns", null, null);
+//            db.delete("task", null, null);
 
             db.execSQL("create table columns ("
                     + "id integer primary key autoincrement,"
@@ -69,7 +83,6 @@ public class MainActivity extends AppCompatActivity {
                     + "description text,"
                     + "done integer" + ");");
 
-            Log.d(LOG_TAG, "--- Insert in mytable: ---");
             // подготовим данные для вставки в виде пар: наименование столбца - значение
 
             cvColumn.put("name", "To do");
@@ -82,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
             cvTask.put("done", 0);
 
             // вставляем запись и получаем ее ID
-//            db.insert("columns", null, cvColumn);
+            db.insert("columns", null, cvColumn);
             db.insert("task", null, cvTask);
 
         }
@@ -91,21 +104,8 @@ public class MainActivity extends AppCompatActivity {
 
         initTabs();
 
+
     }
-
-    public static void initToolbar(AppCompatActivity activity, Toolbar toolbar, String title) {
-
-        toolbar.setTitle(title);
-        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                return false;
-            }
-        });
-
-        activity.setSupportActionBar(toolbar);
-    }
-
 
     private void initTabs() {
         viewPager = (ViewPager) findViewById(R.id.viewPagerColumns);
@@ -118,10 +118,77 @@ public class MainActivity extends AppCompatActivity {
 
         tabLayout.setupWithViewPager(viewPager);
 
-        if (adapter.getCount() < 4)
-            tabLayout.setTabMode(TabLayout.MODE_FIXED);
-        else
-            tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
+        final boolean[] dialogOpen = {false};
+
+        final LinearLayout[] tabStrip = {((LinearLayout) tabLayout.getChildAt(0))};
+
+        tabStrip[0].getChildAt(last + 1).setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+
+
+                if (!dialogOpen[0]) {
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                    builder.setTitle("Добавить колонку");
+
+                    final EditText input = new EditText(MainActivity.this);
+                    input.setHint("Введите название...");
+                    input.setInputType(InputType.TYPE_CLASS_TEXT);
+                    builder.setView(input)
+                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    columnName = input.getText().toString();
+
+                                    if (columnName.length() != 0) {
+                                        dbHelper = new DBHelper(MainActivity.this);
+
+                                        ContentValues cvColumn = new ContentValues();
+
+                                        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+                                        cvColumn.put("name", columnName);
+                                        cvColumn.put("id", last);
+
+                                        db.insert("columns", null, cvColumn);
+
+                                        dbHelper.close();
+
+                                        Intent intent = new Intent(MainActivity.this,
+                                                MainActivity.class);
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                                        MainActivity.this.startActivity(intent);
+                                        finish();
+                                    } else dialog.cancel();
+
+                                }
+                            })
+                            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.cancel();
+                                }
+                            });
+
+                    AlertDialog alert = builder.create();
+                    alert.show();
+                    alert.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                        @Override
+                        public void onCancel(DialogInterface dialogInterface) {
+                            dialogOpen[0] = false;
+                        }
+                    });
+                    dialogOpen[0] = true;
+                }
+
+                return true;
+            }
+        });
+
+        if (adapter.getCount() < 4) tabLayout.setTabMode(TabLayout.MODE_FIXED);
+        else tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
     }
 
     private boolean checkCookieId() {
