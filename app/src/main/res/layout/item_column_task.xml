@@ -34,8 +34,15 @@
                 android:layout_marginTop="10dp"
                 android:textAlignment="center"
                 android:layout_marginRight="30dp"/>
-
         </LinearLayout>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/checkbox_done"
+            android:src="@mipmap/ic_checkbox_blank_outline"
+            android:layout_gravity="right|top"
+            android:padding="10dp"/>
 
     </android.support.v7.widget.CardView>
 

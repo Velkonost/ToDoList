@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -121,14 +122,34 @@ public class ColumnFragment extends AbstractTabFragment{
         ContentValues cv = new ContentValues();
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        Cursor c = db.query("tasks", null, null, null, null, null, null);
+        Cursor c = db.query("task", null, null, null, null, null, null);
 
-        for (int i = 0; i < 2; i++) {
+        int i = 0;
 
-            data.add(new Task(
-                   i, columnId, i, "Task" + i, "uerhwoibu", false
-            ));
-        }
+        if (c.moveToFirst()) {
+
+            // определяем номера столбцов по имени в выборке
+            int idTaskIndex = c.getColumnIndex("id");
+            int columnIdTaskIndex = c.getColumnIndex("columnId");
+            int nameTaskIndex = c.getColumnIndex("name");
+            int descriptionTaskIndex = c.getColumnIndex("description");
+            int doneTaskIndex = c.getColumnIndex("done");
+
+            do {
+
+                if (columnId == c.getInt(columnIdTaskIndex))
+                    data.add(new Task(
+                            c.getInt(idTaskIndex), columnId, i, c.getString(nameTaskIndex),
+                            c.getString(descriptionTaskIndex), c.getInt(doneTaskIndex) == 1
+                    ));
+
+                // переход на следующую строку
+                // а если следующей нет (текущая - последняя), то false - выходим из цикла
+            } while (c.moveToNext());
+        } else Log.d("myLogs", "0 rows");
+
+        c.close();
+        dbHelper.close();
 
         RecyclerView rv = (RecyclerView) view.findViewById(R.id.recyclerViewColumn);
         rv.setLayoutManager(new LinearLayoutManager(context));

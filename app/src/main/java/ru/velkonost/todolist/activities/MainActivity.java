@@ -52,7 +52,9 @@ public class MainActivity extends AppCompatActivity {
         } else {
             saveText(MainActivity.this, ID, "ok");
 
-            ContentValues cv = new ContentValues();
+            ContentValues cvColumn = new ContentValues();
+            ContentValues cvTask = new ContentValues();
+
             SQLiteDatabase db = dbHelper.getWritableDatabase();
 
 
@@ -60,20 +62,28 @@ public class MainActivity extends AppCompatActivity {
                     + "id integer primary key autoincrement,"
                     + "name text," + ");");
 
-            db.execSQL("create table tasks ("
+            db.execSQL("create table task ("
                     + "id integer primary key autoincrement,"
+                    + "columnId integer,"
                     + "name text,"
-                    + "description text"
+                    + "description text,"
                     + "done integer" + ");");
 
             Log.d(LOG_TAG, "--- Insert in mytable: ---");
             // подготовим данные для вставки в виде пар: наименование столбца - значение
 
-            cv.put("name", "To do");
-            cv.put("id", 1);
+            cvColumn.put("name", "To do");
+            cvColumn.put("id", 1);
+
+            cvTask.put("id", 1);
+            cvTask.put("name", "Ознакомиться с приложением");
+            cvTask.put("columnId", 1);
+            cvTask.put("description", "Потыкать. Немного там, немного тут");
+            cvTask.put("done", 0);
+
             // вставляем запись и получаем ее ID
-            long rowID = db.insert("columns", null, cv);
-            Log.i(LOG_TAG, "row inserted, ID = " + rowID);
+//            db.insert("columns", null, cvColumn);
+            db.insert("task", null, cvTask);
 
         }
 
