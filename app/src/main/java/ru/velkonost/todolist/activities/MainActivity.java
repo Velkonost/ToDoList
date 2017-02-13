@@ -231,9 +231,6 @@ public class MainActivity extends AppCompatActivity {
 
                                 if (currentColumnName.length() != 0) {
 
-//                                    ChangeColumnSettings changeColumnSettings = new ChangeColumnSettings();
-//                                    changeColumnSettings.execute();
-
                                     dbHelper = new DBHelper(MainActivity.this);
                                     ContentValues cv = new ContentValues();
                                     SQLiteDatabase db = dbHelper.getWritableDatabase();

@@ -1,16 +1,27 @@
 package ru.velkonost.todolist.activities;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
+import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.ViewSwitcher;
 
 import ru.velkonost.todolist.R;
 import ru.velkonost.todolist.managers.DBHelper;
@@ -35,7 +46,23 @@ public class TaskActivity extends AppCompatActivity {
 
     private TextView isDoneText;
 
+    private Menu menu;
 
+    private EditText editCardName;
+
+    private RecyclerView recyclerViewColumns;
+    private View popupViewColumns;
+    public static PopupWindow popupWindowColumns;
+
+
+    private ViewSwitcher switcher;
+    private String text;
+
+    private EditText mEditText;
+
+
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,6 +72,7 @@ public class TaskActivity extends AppCompatActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         viewDescription = (TextView) findViewById(R.id.taskDescription);
         isDoneText = (TextView) findViewById(R.id.isDoneText);
+        editCardName = (EditText) findViewById(R.id.editCardName);
 
         dbHelper = new DBHelper(this);
         ContentValues cv = new ContentValues();
@@ -69,6 +97,7 @@ public class TaskActivity extends AppCompatActivity {
             isDone = c.getInt(doneTaskIndex) == 1;
             description = c.getString(descriptionTaskIndex);
 
+            setText(description);
 
         } else
             Log.d("myLogs", "0 rows");
@@ -96,5 +125,124 @@ public class TaskActivity extends AppCompatActivity {
         });
 
 
+        switcher = (ViewSwitcher) findViewById(R.id.switcherBoardDescription);
+        mEditText = (EditText) findViewById(R.id.editTaskDescription);
+
+        ((TextView) findViewById(R.id.taskDescription))
+                .setText(
+                        Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
+                                ? Html.fromHtml(text,
+                                Html.FROM_HTML_MODE_LEGACY)
+                                : Html.fromHtml(text)
+                );
+
+        ((EditText) findViewById(R.id.editTaskDescription))
+                .setText(
+                        Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
+                                ? Html.fromHtml(text,
+                                Html.FROM_HTML_MODE_LEGACY)
+                                : Html.fromHtml(text)
+                );
+
+
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_task, menu);
+
+        this.menu = menu;
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        switch (id) {
+            case R.id.action_settings:
+
+                toolbar.setTitle("");
+                editCardName.setVisibility(View.VISIBLE);
+                editCardName.setText(name);
+
+                showNext();
+
+
+                menu.findItem(R.id.action_settings).setVisible(false);
+                menu.findItem(R.id.action_move).setVisible(false);
+
+                menu.findItem(R.id.action_agree).setVisible(true);
+
+                menu.findItem(R.id.action_agree).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem menuItem) {
+
+                        name = editCardName.getText().toString();
+                        description = getText();
+
+                        toolbar.setTitle(name);
+                        changeText();
+                        showNext();
+
+                        editCardName.setVisibility(View.INVISIBLE);
+
+                        menu.findItem(R.id.action_settings).setVisible(true);
+                        menu.findItem(R.id.action_move).setVisible(true);
+
+                        menu.findItem(R.id.action_agree).setVisible(false);
+
+                        dbHelper = new DBHelper(TaskActivity.this);
+                        ContentValues cv = new ContentValues();
+                        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+                        cv.put("name", name);
+                        cv.put("description", name);
+
+                        db.update("task", cv, "id = ?", new String[] {String.valueOf(taskId)});
+                        dbHelper.close();
+
+                        InputMethodManager inputMethodManager = (InputMethodManager)
+                                getSystemService(Context.INPUT_METHOD_SERVICE);
+                        inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+                        getCurrentFocus().clearFocus();
+
+                        return false;
+                    }
+                });
+
+
+                break;
+//            case R.id.action_move:
+//
+//                popupWindowColumns.setOnDismissListener(new PopupWindow.OnDismissListener() {
+//                    @Override
+//                    public void onDismiss() {
+//                        if (Depository.isRefreshPopup())
+//                            changeActivityCompat(BoardCardActivity.this);
+//                        Depository.setRefreshPopup(false);
+//
+//                    }
+//                });
+//
+//
+//                popupWindowColumns.setTouchable(true);
+//                popupWindowColumns.setFocusable(true);
+//                popupWindowColumns.setBackgroundDrawable(new ColorDrawable(getResources()
+//                        .getColor(android.R.color.transparent)));
+//                popupWindowColumns.setOutsideTouchable(true);
+//
+//                popupWindowColumns.showAtLocation(popupViewColumns, Gravity.CENTER, 0, 0);
+//
+//                break;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void showNext(){ switcher.showNext(); }
+    public void setText(String text) { this.text = text; }
+    public void changeText() { viewDescription.setText(mEditText.getText().toString()); }
+    public String getText() { return mEditText.getText().toString(); }
+
 }
