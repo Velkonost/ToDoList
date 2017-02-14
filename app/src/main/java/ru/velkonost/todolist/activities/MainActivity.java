@@ -22,8 +22,15 @@ import ru.velkonost.todolist.R;
 import ru.velkonost.todolist.fragments.ColumnsTabsFragmentAdapter;
 import ru.velkonost.todolist.managers.DBHelper;
 
+import static ru.velkonost.todolist.Constants.COLUMN_ID;
+import static ru.velkonost.todolist.Constants.DESCRIPTION;
+import static ru.velkonost.todolist.Constants.DONE;
+import static ru.velkonost.todolist.Constants.EXIST;
+import static ru.velkonost.todolist.Constants.ID;
+import static ru.velkonost.todolist.Constants.NAME;
 import static ru.velkonost.todolist.fragments.ColumnsTabsFragmentAdapter.last;
-import static ru.velkonost.todolist.managers.Initializatiors.initToolbar;
+import static ru.velkonost.todolist.managers.DBHelper.DBConstants.COLUMNS;
+import static ru.velkonost.todolist.managers.DBHelper.DBConstants.TASKS;
 import static ru.velkonost.todolist.managers.PhoneDataStorage.loadText;
 import static ru.velkonost.todolist.managers.PhoneDataStorage.saveText;
 
@@ -38,8 +45,6 @@ public class MainActivity extends AppCompatActivity {
     private TabLayout tabLayout;
 
     private DBHelper dbHelper;
-
-    final String LOG_TAG = "myLogs";
 
     private String columnName;
 
@@ -58,44 +63,28 @@ public class MainActivity extends AppCompatActivity {
 
         dbHelper = new DBHelper(this);
 
-        initToolbar(MainActivity.this, toolbar, "To Do List");
+        initToolbar(MainActivity.this, toolbar, getResources().getString(R.string.app_name));
 
         if (!checkCookieId()) {
 
-            saveText(MainActivity.this, "exist", "ok");
+            saveText(MainActivity.this, EXIST, getResources().getString(R.string.ok));
 
             ContentValues cvColumn = new ContentValues();
             ContentValues cvTask = new ContentValues();
 
             SQLiteDatabase db = dbHelper.getWritableDatabase();
 
+            cvColumn.put(NAME, getResources().getString(R.string.column_example_name));
+            cvColumn.put(ID, 1);
 
+            cvTask.put(ID, 1);
+            cvTask.put(NAME, getResources().getString(R.string.task_example_name));
+            cvTask.put(COLUMN_ID, 1);
+            cvTask.put(DESCRIPTION, getResources().getString(R.string.task_example_description));
+            cvTask.put(DONE, 0);
 
-            db.execSQL("create table columns ("
-                    + "id integer primary key autoincrement,"
-                    + "name text" + ");");
-
-            db.execSQL("create table task ("
-                    + "id integer primary key autoincrement,"
-                    + "columnId integer,"
-                    + "name text,"
-                    + "description text,"
-                    + "done integer" + ");");
-
-            // подготовим данные для вставки в виде пар: наименование столбца - значение
-
-            cvColumn.put("name", "To do");
-            cvColumn.put("id", 1);
-
-            cvTask.put("id", 1);
-            cvTask.put("name", "Ознакомиться с приложением");
-            cvTask.put("columnId", 1);
-            cvTask.put("description", "Потыкать. Немного там, немного тут");
-            cvTask.put("done", 0);
-
-            // вставляем запись и получаем ее ID
-            db.insert("columns", null, cvColumn);
-            db.insert("task", null, cvTask);
+            db.insert(COLUMNS, null, cvColumn);
+            db.insert(TASKS, null, cvTask);
 
         }
 
@@ -135,13 +124,13 @@ public class MainActivity extends AppCompatActivity {
                 if (!dialogOpen[0]) {
 
                     AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                    builder.setTitle("Добавить колонку");
+                    builder.setTitle(getResources().getString(R.string.add_column));
 
                     final EditText input = new EditText(MainActivity.this);
-                    input.setHint("Введите название...");
+                    input.setHint(getResources().getString(R.string.enter_column_name));
                     input.setInputType(InputType.TYPE_CLASS_TEXT);
                     builder.setView(input)
-                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            .setPositiveButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     columnName = input.getText().toString();
@@ -153,10 +142,9 @@ public class MainActivity extends AppCompatActivity {
 
                                         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-                                        cvColumn.put("name", columnName);
-                                        cvColumn.put("id", last);
+                                        cvColumn.put(NAME, columnName);
 
-                                        db.insert("columns", null, cvColumn);
+                                        db.insert(COLUMNS, null, cvColumn);
 
                                         dbHelper.close();
 
@@ -170,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
 
                                 }
                             })
-                            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            .setNegativeButton(getResources().getString(R.string.cancel), new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     dialog.cancel();
@@ -207,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
                 currentColumnPosition = viewPager.getCurrentItem() + 1;
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                builder.setTitle("Изменить название колонки");
+                builder.setTitle(getResources().getString(R.string.change_column_name));
 
                 final EditText inputName = new EditText(MainActivity.this);
 
@@ -215,7 +203,7 @@ public class MainActivity extends AppCompatActivity {
                 inputName.setInputType(InputType.TYPE_CLASS_TEXT);
 
                 builder.setView(inputName)
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        .setPositiveButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 prevCurrentColumnName = currentColumnName;
@@ -226,9 +214,9 @@ public class MainActivity extends AppCompatActivity {
                                     dbHelper = new DBHelper(MainActivity.this);
                                     ContentValues cv = new ContentValues();
                                     SQLiteDatabase db = dbHelper.getWritableDatabase();
-                                    cv.put("name", currentColumnName);
+                                    cv.put(NAME, currentColumnName);
 
-                                    db.update("columns", cv, "name = ?", new String[] {prevCurrentColumnName});
+                                    db.update(COLUMNS, cv, "name = ?", new String[] {prevCurrentColumnName});
                                     dbHelper.close();
 
                                     Intent intent = new Intent(MainActivity.this,
@@ -241,7 +229,7 @@ public class MainActivity extends AppCompatActivity {
 
                             }
                         })
-                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        .setNegativeButton(getResources().getString(R.string.cancel), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 dialog.cancel();
@@ -258,7 +246,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean checkCookieId() {
-        return loadText(MainActivity.this, "exist").length() != 0;
+        return loadText(MainActivity.this, EXIST).length() != 0;
+    }
+
+    public static void initToolbar(AppCompatActivity activity, Toolbar toolbar, String title) {
+
+        toolbar.setTitle(title);
+        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                return false;
+            }
+        });
+
+        activity.setSupportActionBar(toolbar);
     }
 
 }

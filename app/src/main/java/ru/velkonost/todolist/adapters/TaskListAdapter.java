@@ -19,6 +19,10 @@ import ru.velkonost.todolist.activities.TaskActivity;
 import ru.velkonost.todolist.managers.DBHelper;
 import ru.velkonost.todolist.models.Task;
 
+import static ru.velkonost.todolist.Constants.DONE;
+import static ru.velkonost.todolist.Constants.ID;
+import static ru.velkonost.todolist.managers.DBHelper.DBConstants.TASKS;
+
 public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskListViewHolder> {
 
     private List<Task> data;
@@ -55,38 +59,12 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskLi
             public void onClick(View view) {
 
                 Intent intent = new Intent(mContext, TaskActivity.class);
-                intent.putExtra("id", item.getId());
+                intent.putExtra(ID, item.getId());
 
                 mContext.startActivity(intent);
 
             }
         });
-//
-//        final int id = item.getId();
-//
-//        holder.title.setText(item.getName());
-//        holder.title.setSelected(true);
-//        holder.title.setEllipsize(TextUtils.TruncateAt.MARQUEE);
-//        holder.title.setHorizontallyScrolling(true);
-//        holder.title.setMarqueeRepeatLimit(MARQUEE_REPEAT_LIMIT);
-//
-//        holder.amount.setText(String.valueOf(item.getAmountParticipants()));
-//        holder.amount.setVisibility(View.VISIBLE);
-//
-//        if (item.isBelong()){
-//            holder.isBelong.setVisibility(View.VISIBLE);
-//        }
-//
-//        holder.cardView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Intent intent = new Intent(mContext, BoardCardActivity.class);
-//                intent.putExtra(CARD_ID, id);
-//                intent.putExtra(CARD_NAME, item.getName());
-//
-//                mContext.startActivity(intent);
-//            }
-//        });
 
         holder.imageDone.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -100,14 +78,14 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskLi
 
                 if (holder.isDone){
                     holder.imageDone.setImageResource(R.mipmap.ic_checkbox_marked);
-                    cv.put("done", 1);
+                    cv.put(DONE, 1);
                 }
                 else{
                     holder.imageDone.setImageResource(R.mipmap.ic_checkbox_blank_outline);
-                    cv.put("done", 0);
+                    cv.put(DONE, 0);
                 }
 
-                db.update("task", cv, "id = ?", new String[] {String.valueOf(item.getId())});
+                db.update(TASKS, cv, "id = ?", new String[] {String.valueOf(item.getId())});
                 dbHelper.close();
             }
         });

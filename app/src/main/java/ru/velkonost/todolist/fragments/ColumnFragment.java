@@ -30,7 +30,15 @@ import ru.velkonost.todolist.adapters.TaskListAdapter;
 import ru.velkonost.todolist.managers.DBHelper;
 import ru.velkonost.todolist.models.Task;
 
-public class ColumnFragment extends AbstractTabFragment{
+import static ru.velkonost.todolist.Constants.COLUMN_ID;
+import static ru.velkonost.todolist.Constants.DESCRIPTION;
+import static ru.velkonost.todolist.Constants.DONE;
+import static ru.velkonost.todolist.Constants.ID;
+import static ru.velkonost.todolist.Constants.LOG_TAG;
+import static ru.velkonost.todolist.Constants.NAME;
+import static ru.velkonost.todolist.managers.DBHelper.DBConstants.TASKS;
+
+public class ColumnFragment extends BaseTabFragment {
 
     private static final int LAYOUT = R.layout.fragment_column;
 
@@ -79,25 +87,25 @@ public class ColumnFragment extends AbstractTabFragment{
                 params.setMargins(0, dp2px(20), 0, dp2px(20));
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setTitle("Добавить задачу");
+                builder.setTitle(getResources().getString(R.string.add_task));
 
                 final EditText inputName = new EditText(context);
                 inputName.setLayoutParams(params);
 
-                inputName.setHint("Введите название...");
+                inputName.setHint(getResources().getString(R.string.enter_task_name));
                 inputName.setInputType(InputType.TYPE_CLASS_TEXT);
                 layout.addView(inputName);
 
                 final EditText inputDesc = new EditText(context);
                 inputDesc.setLayoutParams(params);
 
-                inputDesc.setHint("Enter card's description...");
+                inputDesc.setHint(getResources().getString(R.string.enter_task_description));
                 layout.addView(inputDesc);
 
 
                 builder.setView(layout)
 
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        .setPositiveButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 cardName = inputName.getText().toString();
@@ -111,12 +119,12 @@ public class ColumnFragment extends AbstractTabFragment{
 
                                     SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-                                    cvTask.put("name", cardName);
-                                    cvTask.put("columnId", columnId);
-                                    cvTask.put("done", 0);
-                                    cvTask.put("description", cardDescription);
+                                    cvTask.put(NAME, cardName);
+                                    cvTask.put(COLUMN_ID, columnId);
+                                    cvTask.put(DONE, 0);
+                                    cvTask.put(DESCRIPTION, cardDescription);
 
-                                    db.insert("task", null, cvTask);
+                                    db.insert(TASKS, null, cvTask);
 
                                     dbHelper.close();
 
@@ -131,7 +139,7 @@ public class ColumnFragment extends AbstractTabFragment{
 
                             }
                         })
-                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        .setNegativeButton(getResources().getString(R.string.cancel), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 dialog.cancel();
@@ -148,18 +156,18 @@ public class ColumnFragment extends AbstractTabFragment{
         ContentValues cv = new ContentValues();
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        Cursor c = db.query("task", null, null, null, null, null, null);
+        Cursor c = db.query(TASKS, null, null, null, null, null, null);
 
         int i = 0;
 
         if (c.moveToFirst()) {
 
             // определяем номера столбцов по имени в выборке
-            int idTaskIndex = c.getColumnIndex("id");
-            int columnIdTaskIndex = c.getColumnIndex("columnId");
-            int nameTaskIndex = c.getColumnIndex("name");
-            int descriptionTaskIndex = c.getColumnIndex("description");
-            int doneTaskIndex = c.getColumnIndex("done");
+            int idTaskIndex = c.getColumnIndex(ID);
+            int columnIdTaskIndex = c.getColumnIndex(COLUMN_ID);
+            int nameTaskIndex = c.getColumnIndex(NAME);
+            int descriptionTaskIndex = c.getColumnIndex(DESCRIPTION);
+            int doneTaskIndex = c.getColumnIndex(DONE);
 
             do {
 
@@ -172,7 +180,7 @@ public class ColumnFragment extends AbstractTabFragment{
                 // переход на следующую строку
                 // а если следующей нет (текущая - последняя), то false - выходим из цикла
             } while (c.moveToNext());
-        } else Log.d("myLogs", "0 rows");
+        } else Log.d(LOG_TAG, "0 rows");
 
         c.close();
         dbHelper.close();

@@ -28,7 +28,12 @@ import android.widget.ViewSwitcher;
 import ru.velkonost.todolist.R;
 import ru.velkonost.todolist.managers.DBHelper;
 
-import static ru.velkonost.todolist.managers.Initializatiors.initToolbar;
+import static ru.velkonost.todolist.Constants.DESCRIPTION;
+import static ru.velkonost.todolist.Constants.DONE;
+import static ru.velkonost.todolist.Constants.LOG_TAG;
+import static ru.velkonost.todolist.Constants.NAME;
+import static ru.velkonost.todolist.activities.MainActivity.initToolbar;
+import static ru.velkonost.todolist.managers.DBHelper.DBConstants.TASKS;
 
 public class TaskActivity extends AppCompatActivity {
 
@@ -83,7 +88,7 @@ public class TaskActivity extends AppCompatActivity {
         Intent intent = getIntent();
         taskId = intent.getIntExtra("id", 0);
 
-        Cursor c = db.query("task",
+        Cursor c = db.query(TASKS,
                 null,
                 "id = ?",
                 new String[] {String.valueOf(taskId)},
@@ -91,9 +96,9 @@ public class TaskActivity extends AppCompatActivity {
 
         if (c.moveToFirst()) {
 
-            int nameTaskIndex = c.getColumnIndex("name");
-            int doneTaskIndex = c.getColumnIndex("done");
-            int descriptionTaskIndex = c.getColumnIndex("description");
+            int nameTaskIndex = c.getColumnIndex(NAME);
+            int doneTaskIndex = c.getColumnIndex(DONE);
+            int descriptionTaskIndex = c.getColumnIndex(DESCRIPTION);
 
             name = c.getString(nameTaskIndex);
             isDone = c.getInt(doneTaskIndex) == 1;
@@ -102,17 +107,17 @@ public class TaskActivity extends AppCompatActivity {
             if (description == null) description = " ";
 
         } else
-            Log.d("myLogs", "0 rows");
+            Log.d(LOG_TAG, "0 rows");
 
         initToolbar(TaskActivity.this, toolbar, name);
         viewDescription.setText(description);
 
         if (isDone) {
-            isDoneText.setText("Завершено");
+            isDoneText.setText(getResources().getString(R.string.task_completed));
             isDoneText.setTextColor(getResources().getColor(R.color.colorGreen));
         }
         else {
-            isDoneText.setText("Не завершено");
+            isDoneText.setText(getResources().getString(R.string.task_dont_completed));
             isDoneText.setTextColor(getResources().getColor(R.color.colorRed));
         }
 
@@ -198,10 +203,10 @@ public class TaskActivity extends AppCompatActivity {
                         ContentValues cv = new ContentValues();
                         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-                        cv.put("name", name);
-                        cv.put("description", name);
+                        cv.put(NAME, name);
+                        cv.put(DESCRIPTION, name);
 
-                        db.update("task", cv, "id = ?", new String[] {String.valueOf(taskId)});
+                        db.update(TASKS, cv, "id = ?", new String[] {String.valueOf(taskId)});
                         dbHelper.close();
 
                         InputMethodManager inputMethodManager = (InputMethodManager)
@@ -218,24 +223,24 @@ public class TaskActivity extends AppCompatActivity {
             case R.id.action_delete:
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(TaskActivity.this);
-                builder.setTitle("Удаление задачи")
-                        .setMessage("Вы уверены?")
+                builder.setTitle(getResources().getString(R.string.delete_task))
+                        .setMessage(getResources().getString(R.string.are_you_sure))
 //                .setIcon(R.drawable.ic_android_cat) МОЖНО ДОБАВИТЬ ИКОНКУ!
                         .setCancelable(false)
-                        .setNegativeButton("Нет",
+                        .setNegativeButton(getResources().getString(R.string.no),
                                 new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
                                         dialog.cancel();
                                     }
                                 })
-                        .setPositiveButton("Да", new DialogInterface.OnClickListener() {
+                        .setPositiveButton(getResources().getString(R.string.yes), new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
 
                                 dbHelper = new DBHelper(TaskActivity.this);
                                 ContentValues cv = new ContentValues();
                                 SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-                                db.delete("task",
+                                db.delete(TASKS,
                                         "id = ?",
                                         new String[] {String.valueOf(taskId)});
                                 dbHelper.close();

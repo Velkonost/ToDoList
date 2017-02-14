@@ -14,9 +14,14 @@ import java.util.Map;
 
 import ru.velkonost.todolist.managers.DBHelper;
 
+import static ru.velkonost.todolist.Constants.ID;
+import static ru.velkonost.todolist.Constants.LOG_TAG;
+import static ru.velkonost.todolist.Constants.NAME;
+import static ru.velkonost.todolist.managers.DBHelper.DBConstants.COLUMNS;
+
 public class ColumnsTabsFragmentAdapter extends FragmentPagerAdapter {
 
-    private Map<Integer, AbstractTabFragment> tabs;
+    private Map<Integer, BaseTabFragment> tabs;
     private Context context;
     public static int last = 0;
 
@@ -31,7 +36,6 @@ public class ColumnsTabsFragmentAdapter extends FragmentPagerAdapter {
 
     @Override
     public CharSequence getPageTitle(int position) {
-        Log.i("KEKE", String.valueOf(position));
         return tabs.get(position).getTitle();
     }
 
@@ -53,23 +57,24 @@ public class ColumnsTabsFragmentAdapter extends FragmentPagerAdapter {
         ContentValues cv = new ContentValues();
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        Cursor c = db.query("columns", null, null, null, null, null, null);
+        Cursor c = db.query(COLUMNS, null, null, null, null, null, null);
 
+        last = 0;
         int i = 0;
 
         if (c.moveToFirst()) {
 
 
             // определяем номера столбцов по имени в выборке
-            int idColIndex = c.getColumnIndex("id");
-            int nameColIndex = c.getColumnIndex("name");
+            int idColIndex = c.getColumnIndex(ID);
+            int nameColIndex = c.getColumnIndex(NAME);
 
             do {
 
 
 
                 // получаем значения по номерам столбцов и пишем все в лог
-                Log.d("myLogs",
+                Log.d(LOG_TAG,
                         "ID = " + c.getInt(idColIndex) +
                                 ", name = " + c.getString(nameColIndex));
 
@@ -83,7 +88,7 @@ public class ColumnsTabsFragmentAdapter extends FragmentPagerAdapter {
                 i ++;
             } while (c.moveToNext());
         } else
-            Log.d("myLogs", "0 rows");
+            Log.d(LOG_TAG, "0 rows");
         c.close();
         dbHelper.close();
 

@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import ru.velkonost.todolist.R;
 
 
-public class AddColumnFragment extends AbstractTabFragment {
+public class AddColumnFragment extends BaseTabFragment {
 
     private static final int LAYOUT = R.layout.fragment_add_column;
 
