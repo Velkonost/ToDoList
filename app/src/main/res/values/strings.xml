@@ -20,5 +20,7 @@
     <string name="column_example_name">To do</string>
     <string name="task_example_description">Look around :)</string>
 
+    <string name="zero_rows">0 rows</string>
+
 
 </resources>

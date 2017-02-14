@@ -1,18 +1,15 @@
 package ru.velkonost.todolist.activities;
 
 import android.app.AlertDialog;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.util.Log;
@@ -21,7 +18,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
@@ -30,10 +26,10 @@ import ru.velkonost.todolist.managers.DBHelper;
 
 import static ru.velkonost.todolist.Constants.DESCRIPTION;
 import static ru.velkonost.todolist.Constants.DONE;
+import static ru.velkonost.todolist.Constants.ID;
 import static ru.velkonost.todolist.Constants.LOG_TAG;
 import static ru.velkonost.todolist.Constants.NAME;
 import static ru.velkonost.todolist.activities.MainActivity.initToolbar;
-import static ru.velkonost.todolist.managers.DBHelper.DBConstants.TASKS;
 
 public class TaskActivity extends AppCompatActivity {
 
@@ -57,11 +53,6 @@ public class TaskActivity extends AppCompatActivity {
 
     private EditText editCardName;
 
-    private RecyclerView recyclerViewColumns;
-    private View popupViewColumns;
-    public static PopupWindow popupWindowColumns;
-
-
     private ViewSwitcher switcher;
     private String text;
 
@@ -82,17 +73,10 @@ public class TaskActivity extends AppCompatActivity {
         editCardName = (EditText) findViewById(R.id.editCardName);
 
         dbHelper = new DBHelper(this);
-        ContentValues cv = new ContentValues();
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-
         Intent intent = getIntent();
-        taskId = intent.getIntExtra("id", 0);
+        taskId = intent.getIntExtra(ID, 0);
 
-        Cursor c = db.query(TASKS,
-                null,
-                "id = ?",
-                new String[] {String.valueOf(taskId)},
-                null, null, null);
+        Cursor c = dbHelper.queryByIdInTasks(taskId);
 
         if (c.moveToFirst()) {
 
@@ -106,8 +90,7 @@ public class TaskActivity extends AppCompatActivity {
 
             if (description == null) description = " ";
 
-        } else
-            Log.d(LOG_TAG, "0 rows");
+        } else Log.d(LOG_TAG, "0 rows");
 
         initToolbar(TaskActivity.this, toolbar, name);
         viewDescription.setText(description);
@@ -175,7 +158,6 @@ public class TaskActivity extends AppCompatActivity {
 
                 showNext();
 
-
                 menu.findItem(R.id.action_settings).setVisible(false);
                 menu.findItem(R.id.action_delete).setVisible(false);
 
@@ -200,13 +182,7 @@ public class TaskActivity extends AppCompatActivity {
                         menu.findItem(R.id.action_agree).setVisible(false);
 
                         dbHelper = new DBHelper(TaskActivity.this);
-                        ContentValues cv = new ContentValues();
-                        SQLiteDatabase db = dbHelper.getWritableDatabase();
-
-                        cv.put(NAME, name);
-                        cv.put(DESCRIPTION, name);
-
-                        db.update(TASKS, cv, "id = ?", new String[] {String.valueOf(taskId)});
+                        dbHelper.updateInTasks(name, description, taskId);
                         dbHelper.close();
 
                         InputMethodManager inputMethodManager = (InputMethodManager)
@@ -237,12 +213,7 @@ public class TaskActivity extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int id) {
 
                                 dbHelper = new DBHelper(TaskActivity.this);
-                                ContentValues cv = new ContentValues();
-                                SQLiteDatabase db = dbHelper.getWritableDatabase();
-
-                                db.delete(TASKS,
-                                        "id = ?",
-                                        new String[] {String.valueOf(taskId)});
+                                dbHelper.deleteInTasks(taskId);
                                 dbHelper.close();
 
                                 TaskActivity.this.startActivity(new Intent(TaskActivity.this,

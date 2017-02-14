@@ -1,11 +1,9 @@
 package ru.velkonost.todolist.fragments;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -36,7 +34,6 @@ import static ru.velkonost.todolist.Constants.DONE;
 import static ru.velkonost.todolist.Constants.ID;
 import static ru.velkonost.todolist.Constants.LOG_TAG;
 import static ru.velkonost.todolist.Constants.NAME;
-import static ru.velkonost.todolist.managers.DBHelper.DBConstants.TASKS;
 
 public class ColumnFragment extends BaseTabFragment {
 
@@ -104,7 +101,6 @@ public class ColumnFragment extends BaseTabFragment {
 
 
                 builder.setView(layout)
-
                         .setPositiveButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -114,18 +110,7 @@ public class ColumnFragment extends BaseTabFragment {
                                 if (cardName.length() != 0) {
 
                                     dbHelper = new DBHelper(context);
-
-                                    ContentValues cvTask = new ContentValues();
-
-                                    SQLiteDatabase db = dbHelper.getWritableDatabase();
-
-                                    cvTask.put(NAME, cardName);
-                                    cvTask.put(COLUMN_ID, columnId);
-                                    cvTask.put(DONE, 0);
-                                    cvTask.put(DESCRIPTION, cardDescription);
-
-                                    db.insert(TASKS, null, cvTask);
-
+                                    dbHelper.insertInTask(cardName, cardDescription, columnId);
                                     dbHelper.close();
 
                                     Intent intent = new Intent(context,
@@ -153,11 +138,8 @@ public class ColumnFragment extends BaseTabFragment {
         });
 
         dbHelper = new DBHelper(context);
-        ContentValues cv = new ContentValues();
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        Cursor c = db.query(TASKS, null, null, null, null, null, null);
-
+        Cursor c = dbHelper.queryInTasks();
         int i = 0;
 
         if (c.moveToFirst()) {
@@ -176,11 +158,8 @@ public class ColumnFragment extends BaseTabFragment {
                             c.getInt(idTaskIndex), columnId, i, c.getString(nameTaskIndex),
                             c.getString(descriptionTaskIndex), c.getInt(doneTaskIndex) == 1
                     ));
-
-                // переход на следующую строку
-                // а если следующей нет (текущая - последняя), то false - выходим из цикла
             } while (c.moveToNext());
-        } else Log.d(LOG_TAG, "0 rows");
+        } else Log.d(LOG_TAG, getResources().getString(R.string.zero_rows));
 
         c.close();
         dbHelper.close();

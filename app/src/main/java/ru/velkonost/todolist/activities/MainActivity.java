@@ -1,9 +1,7 @@
 package ru.velkonost.todolist.activities;
 
-import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -22,15 +20,8 @@ import ru.velkonost.todolist.R;
 import ru.velkonost.todolist.fragments.ColumnsTabsFragmentAdapter;
 import ru.velkonost.todolist.managers.DBHelper;
 
-import static ru.velkonost.todolist.Constants.COLUMN_ID;
-import static ru.velkonost.todolist.Constants.DESCRIPTION;
-import static ru.velkonost.todolist.Constants.DONE;
 import static ru.velkonost.todolist.Constants.EXIST;
-import static ru.velkonost.todolist.Constants.ID;
-import static ru.velkonost.todolist.Constants.NAME;
 import static ru.velkonost.todolist.fragments.ColumnsTabsFragmentAdapter.last;
-import static ru.velkonost.todolist.managers.DBHelper.DBConstants.COLUMNS;
-import static ru.velkonost.todolist.managers.DBHelper.DBConstants.TASKS;
 import static ru.velkonost.todolist.managers.PhoneDataStorage.loadText;
 import static ru.velkonost.todolist.managers.PhoneDataStorage.saveText;
 
@@ -66,26 +57,8 @@ public class MainActivity extends AppCompatActivity {
         initToolbar(MainActivity.this, toolbar, getResources().getString(R.string.app_name));
 
         if (!checkCookieId()) {
-
             saveText(MainActivity.this, EXIST, getResources().getString(R.string.ok));
-
-            ContentValues cvColumn = new ContentValues();
-            ContentValues cvTask = new ContentValues();
-
-            SQLiteDatabase db = dbHelper.getWritableDatabase();
-
-            cvColumn.put(NAME, getResources().getString(R.string.column_example_name));
-            cvColumn.put(ID, 1);
-
-            cvTask.put(ID, 1);
-            cvTask.put(NAME, getResources().getString(R.string.task_example_name));
-            cvTask.put(COLUMN_ID, 1);
-            cvTask.put(DESCRIPTION, getResources().getString(R.string.task_example_description));
-            cvTask.put(DONE, 0);
-
-            db.insert(COLUMNS, null, cvColumn);
-            db.insert(TASKS, null, cvTask);
-
+            dbHelper.addBase();
         }
 
         dbHelper.close();
@@ -137,15 +110,7 @@ public class MainActivity extends AppCompatActivity {
 
                                     if (columnName.length() != 0) {
                                         dbHelper = new DBHelper(MainActivity.this);
-
-                                        ContentValues cvColumn = new ContentValues();
-
-                                        SQLiteDatabase db = dbHelper.getWritableDatabase();
-
-                                        cvColumn.put(NAME, columnName);
-
-                                        db.insert(COLUMNS, null, cvColumn);
-
+                                        dbHelper.insertInColumns(columnName);
                                         dbHelper.close();
 
                                         Intent intent = new Intent(MainActivity.this,
@@ -212,11 +177,8 @@ public class MainActivity extends AppCompatActivity {
                                 if (currentColumnName.length() != 0) {
 
                                     dbHelper = new DBHelper(MainActivity.this);
-                                    ContentValues cv = new ContentValues();
-                                    SQLiteDatabase db = dbHelper.getWritableDatabase();
-                                    cv.put(NAME, currentColumnName);
-
-                                    db.update(COLUMNS, cv, "name = ?", new String[] {prevCurrentColumnName});
+                                    dbHelper.updateNameInColumns(currentColumnName,
+                                            prevCurrentColumnName);
                                     dbHelper.close();
 
                                     Intent intent = new Intent(MainActivity.this,
@@ -229,7 +191,8 @@ public class MainActivity extends AppCompatActivity {
 
                             }
                         })
-                        .setNegativeButton(getResources().getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                        .setNegativeButton(getResources().getString(R.string.cancel),
+                                new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 dialog.cancel();

@@ -1,9 +1,7 @@
 package ru.velkonost.todolist.adapters;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -19,11 +17,10 @@ import ru.velkonost.todolist.activities.TaskActivity;
 import ru.velkonost.todolist.managers.DBHelper;
 import ru.velkonost.todolist.models.Task;
 
-import static ru.velkonost.todolist.Constants.DONE;
 import static ru.velkonost.todolist.Constants.ID;
-import static ru.velkonost.todolist.managers.DBHelper.DBConstants.TASKS;
 
-public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskListViewHolder> {
+public class TaskListAdapter
+        extends RecyclerView.Adapter<TaskListAdapter.TaskListViewHolder> {
 
     private List<Task> data;
     private Context mContext;
@@ -73,19 +70,18 @@ public class TaskListAdapter extends RecyclerView.Adapter<TaskListAdapter.TaskLi
                 holder.isDone = !holder.isDone;
 
                 dbHelper = new DBHelper(mContext);
-                ContentValues cv = new ContentValues();
-                SQLiteDatabase db = dbHelper.getWritableDatabase();
+                int done;
 
                 if (holder.isDone){
                     holder.imageDone.setImageResource(R.mipmap.ic_checkbox_marked);
-                    cv.put(DONE, 1);
+                    done = 1;
                 }
                 else{
                     holder.imageDone.setImageResource(R.mipmap.ic_checkbox_blank_outline);
-                    cv.put(DONE, 0);
+                    done = 0;
                 }
 
-                db.update(TASKS, cv, "id = ?", new String[] {String.valueOf(item.getId())});
+                dbHelper.updateDoneInTasks(done, item.getId());
                 dbHelper.close();
             }
         });

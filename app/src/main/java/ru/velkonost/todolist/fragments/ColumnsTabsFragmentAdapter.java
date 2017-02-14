@@ -1,9 +1,7 @@
 package ru.velkonost.todolist.fragments;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -12,12 +10,12 @@ import android.util.Log;
 import java.util.HashMap;
 import java.util.Map;
 
+import ru.velkonost.todolist.R;
 import ru.velkonost.todolist.managers.DBHelper;
 
 import static ru.velkonost.todolist.Constants.ID;
 import static ru.velkonost.todolist.Constants.LOG_TAG;
 import static ru.velkonost.todolist.Constants.NAME;
-import static ru.velkonost.todolist.managers.DBHelper.DBConstants.COLUMNS;
 
 public class ColumnsTabsFragmentAdapter extends FragmentPagerAdapter {
 
@@ -54,25 +52,17 @@ public class ColumnsTabsFragmentAdapter extends FragmentPagerAdapter {
         tabs = new HashMap<>();
 
         dbHelper = new DBHelper(context);
-        ContentValues cv = new ContentValues();
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-
-        Cursor c = db.query(COLUMNS, null, null, null, null, null, null);
+        Cursor c = dbHelper.queryInColumns();
 
         last = 0;
         int i = 0;
 
         if (c.moveToFirst()) {
-
-
             // определяем номера столбцов по имени в выборке
             int idColIndex = c.getColumnIndex(ID);
             int nameColIndex = c.getColumnIndex(NAME);
 
             do {
-
-
-
                 // получаем значения по номерам столбцов и пишем все в лог
                 Log.d(LOG_TAG,
                         "ID = " + c.getInt(idColIndex) +
@@ -81,14 +71,13 @@ public class ColumnsTabsFragmentAdapter extends FragmentPagerAdapter {
                 tabs.put(i, ColumnFragment.getInstance(context, c.getInt(idColIndex),
                         c.getString(nameColIndex)));
 
-                // переход на следующую строку
-                // а если следующей нет (текущая - последняя), то false - выходим из цикла
 
                 last = i;
                 i ++;
+
             } while (c.moveToNext());
         } else
-            Log.d(LOG_TAG, "0 rows");
+            Log.d(LOG_TAG, context.getResources().getString(R.string.zero_rows));
         c.close();
         dbHelper.close();
 
