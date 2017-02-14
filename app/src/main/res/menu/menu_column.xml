@@ -6,7 +6,7 @@
         android:id="@+id/action_change"
         app:showAsAction="always"
         android:title="Изменить"
-        android:icon="@mipmap/ic_lead_pencil">
+        android:icon="@drawable/ic_mode_edit_white_24dp">
     </item>
 
 </menu>

@@ -40,7 +40,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/checkbox_done"
-            android:src="@mipmap/ic_checkbox_blank_outline"
+            android:src="@drawable/ic_check_box_outline_blank_black_24dp"
             android:layout_gravity="right|top"
             android:padding="10dp"/>
 

@@ -27,8 +27,6 @@ import static ru.velkonost.todolist.managers.PhoneDataStorage.saveText;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final int LAYOUT = R.layout.activity_main;
-
     private ViewPager viewPager;
 
     private Toolbar toolbar;
@@ -48,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(LAYOUT);
+        setContentView(R.layout.activity_main);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
 

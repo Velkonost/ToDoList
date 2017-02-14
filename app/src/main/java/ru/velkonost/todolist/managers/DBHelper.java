@@ -144,8 +144,8 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public static class DBConstants {
 
-        public static final String COLUMNS = "stodolist_columns";
-        public static final String TASKS = "stodolist_task";
+        public static final String COLUMNS = "todolist_columns";
+        public static final String TASKS = "todolist_task";
 
 
     }

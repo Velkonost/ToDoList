@@ -17,6 +17,6 @@
         android:orderInCategory="100"
         app:showAsAction="ifRoom"
         android:title="Принять"
-        android:icon="@mipmap/ic_check"
+        android:icon="@drawable/ic_check_white_24dp"
         android:visible="false"/>
 </menu>

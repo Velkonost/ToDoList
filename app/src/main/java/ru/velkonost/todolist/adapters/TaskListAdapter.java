@@ -48,8 +48,8 @@ public class TaskListAdapter
 
         holder.isDone = item.isDone();
 
-        if (holder.isDone) holder.imageDone.setImageResource(R.mipmap.ic_checkbox_marked);
-        else holder.imageDone.setImageResource(R.mipmap.ic_checkbox_blank_outline);
+        if (holder.isDone) holder.imageDone.setImageResource(R.drawable.ic_check_box_black_24dp);
+        else holder.imageDone.setImageResource(R.drawable.ic_check_box_outline_blank_black_24dp);
 
         holder.mCardView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -73,11 +73,11 @@ public class TaskListAdapter
                 int done;
 
                 if (holder.isDone){
-                    holder.imageDone.setImageResource(R.mipmap.ic_checkbox_marked);
+                    holder.imageDone.setImageResource(R.drawable.ic_check_box_black_24dp);
                     done = 1;
                 }
                 else{
-                    holder.imageDone.setImageResource(R.mipmap.ic_checkbox_blank_outline);
+                    holder.imageDone.setImageResource(R.drawable.ic_check_box_outline_blank_black_24dp);
                     done = 0;
                 }
 

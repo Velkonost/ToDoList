@@ -33,8 +33,6 @@ import static ru.velkonost.todolist.activities.MainActivity.initToolbar;
 
 public class TaskActivity extends AppCompatActivity {
 
-    private static final int LAYOUT = R.layout.activity_task;
-
     private Toolbar toolbar;
 
     private DBHelper dbHelper;
@@ -65,7 +63,7 @@ public class TaskActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(LAYOUT);
+        setContentView(R.layout.activity_task);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         viewDescription = (TextView) findViewById(R.id.taskDescription);
@@ -106,7 +104,7 @@ public class TaskActivity extends AppCompatActivity {
 
 
 
-        toolbar.setNavigationIcon(R.mipmap.ic_keyboard_backspace);
+        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
