@@ -7,11 +7,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Vibrator;
+import android.util.Log;
 
-import ru.velkonost.todolist.activities.MainActivity;
+import ru.velkonost.todolist.activities.TaskActivity;
 
 import static ru.velkonost.todolist.Constants.CONTENT_TEXT;
 import static ru.velkonost.todolist.Constants.CONTENT_TITLE;
+import static ru.velkonost.todolist.Constants.ID;
 import static ru.velkonost.todolist.Constants.TICKER;
 
 public class TimeNotification extends BroadcastReceiver {
@@ -25,8 +27,11 @@ public class TimeNotification extends BroadcastReceiver {
 
         NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         //Интент для активити, которую мы хотим запускать при нажатии на уведомление
-        Intent intentTL = new Intent(context, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 1, intentTL, 0);
+        Intent intentTL = new Intent(context, TaskActivity.class);
+        Log.i("KEKE", String.valueOf(intent.getIntExtra(ID, 0)));
+        intentTL.putExtra(ID, intent.getIntExtra(ID, 0));
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 1,
+                intentTL, PendingIntent.FLAG_UPDATE_CURRENT);
 
         Notification.Builder builder = new Notification.Builder(context);
         builder.setAutoCancel(false);

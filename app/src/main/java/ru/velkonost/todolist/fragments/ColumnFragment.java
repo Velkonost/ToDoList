@@ -62,7 +62,7 @@ public class ColumnFragment extends BaseTabFragment {
 
     private DatePickerDialog datePicker;
 
-    private int mYear, mMonth, mDay, mHour, mMinute;
+    private int mHour, mMinute;
 
     private DBHelper dbHelper;
 
@@ -91,13 +91,13 @@ public class ColumnFragment extends BaseTabFragment {
         addCardButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                LinearLayout layout = new LinearLayout(context);
+                final LinearLayout layout = new LinearLayout(context);
                 layout.setOrientation(LinearLayout.VERTICAL);
 
                 /**
                  * Использует для получения даты.
                  */
-                Calendar newCalendar = Calendar.getInstance();
+                final Calendar newCalendar = Calendar.getInstance();
 
                 LinearLayout.LayoutParams  params =
                         new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
@@ -217,21 +217,36 @@ public class ColumnFragment extends BaseTabFragment {
                                         e.printStackTrace();
                                     }
 
+                                    dbHelper = new DBHelper(context);
+                                    String newTaskId = String.valueOf(dbHelper.insertInTask(cardName, cardDescription, columnId, timeInMilliseconds));
+
+//                                    String newTaskId = null;
+//
+//                                    if (cursor.moveToFirst()) {
+//
+//                                        int idTaskIndex = cursor.getColumnIndex(ID);
+//
+//                                        newTaskId = cursor.getString(idTaskIndex);
+//
+//                                    } else Log.d(LOG_TAG, getResources().getString(R.string.zero_rows));
+//
+//                                    dbHelper.close();
+
+                                    Log.i("KEKE", String.valueOf(newTaskId));
+
                                     AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
                                     Intent intentNotification = new Intent(context, RebootService.class);
 
                                     intentNotification.putExtra(TICKER, "To do list: " + cardName);
                                     intentNotification.putExtra(CONTENT_TITLE, "Задача: " + cardName);
                                     intentNotification.putExtra(CONTENT_TEXT, cardDescription);
+                                    intentNotification.putExtra(ID, Integer.parseInt(newTaskId));
 
                                     PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0,
                                             intentNotification, PendingIntent.FLAG_UPDATE_CURRENT);
 
                                     am.set(AlarmManager.RTC_WAKEUP, timeInMilliseconds, pendingIntent);
 
-                                    dbHelper = new DBHelper(context);
-                                    dbHelper.insertInTask(cardName, cardDescription, columnId, timeInMilliseconds);
-                                    dbHelper.close();
 
                                     Intent intent = new Intent(context,
                                             MainActivity.class);
@@ -272,11 +287,12 @@ public class ColumnFragment extends BaseTabFragment {
 
             do {
 
-                if (columnId == c.getInt(columnIdTaskIndex))
+                if (columnId == c.getInt(columnIdTaskIndex)) {
                     data.add(new Task(
                             c.getInt(idTaskIndex), columnId, i, c.getString(nameTaskIndex),
                             c.getString(descriptionTaskIndex), c.getInt(doneTaskIndex) == 1
                     ));
+                }
             } while (c.moveToNext());
         } else Log.d(LOG_TAG, getResources().getString(R.string.zero_rows));
 
@@ -290,41 +306,6 @@ public class ColumnFragment extends BaseTabFragment {
 
         return view;
     }
-
-    public void chooseDate(View w){
-        datePicker.show();
-    }
-
-
-//    private void initDateBirthdayDatePicker(){
-//        /**
-//         * Использует для получения даты.
-//         */
-//        Calendar newCalendar = Calendar.getInstance();
-//
-//        /**
-//         * Требуется для дальнейшего преобразования даты в строку.
-//         */
-//        @SuppressLint("SimpleDateFormat") final SimpleDateFormat dateFormat
-//                = new SimpleDateFormat("dd-MM-yyyy");
-//
-//        /**
-//         * Создает объект и инициализирует обработчиком события выбора даты и данными для даты по умолчанию.
-//         */
-//        datePicker = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
-//            // функция onDateSet обрабатывает шаг 2: отображает выбранные нами данные в элементе EditText
-//            @Override
-//            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-//                Calendar newCal = Calendar.getInstance();
-//                newCal.set(year, monthOfYear, dayOfMonth);
-//                editBirthday.setText(dateFormat.format(newCal.getTime()));
-//            }
-//        },
-//                newCalendar.get(Calendar.YEAR),
-//                newCalendar.get(Calendar.MONTH),
-//                newCalendar.get(Calendar.DAY_OF_MONTH));
-//    }
-
 
     private int dp2px(int dp) {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,

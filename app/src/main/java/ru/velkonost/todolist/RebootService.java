@@ -11,6 +11,7 @@ import java.util.Calendar;
 
 import static ru.velkonost.todolist.Constants.CONTENT_TEXT;
 import static ru.velkonost.todolist.Constants.CONTENT_TITLE;
+import static ru.velkonost.todolist.Constants.ID;
 import static ru.velkonost.todolist.Constants.TICKER;
 
 public class RebootService extends BroadcastReceiver {
@@ -26,6 +27,7 @@ public class RebootService extends BroadcastReceiver {
         intentNotification.putExtra(TICKER, intent.getStringExtra(TICKER));
         intentNotification.putExtra(CONTENT_TITLE, intent.getStringExtra(CONTENT_TITLE));
         intentNotification.putExtra(CONTENT_TEXT, intent.getStringExtra(CONTENT_TEXT));
+        intentNotification.putExtra(ID, intent.getIntExtra(ID, 0));
 
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0,
                 intentNotification, PendingIntent.FLAG_UPDATE_CURRENT);

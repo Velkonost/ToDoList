@@ -59,7 +59,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     }
 
-    public void insertInTask(String name, String description, int columnId, long date) {
+    public long insertInTask(String name, String description, int columnId, long date) {
         ContentValues cvTask = new ContentValues();
         SQLiteDatabase db = this.getWritableDatabase();
         cvTask.put(NAME, name);
@@ -67,7 +67,13 @@ public class DBHelper extends SQLiteOpenHelper {
         cvTask.put(DONE, 0);
         cvTask.put(DESCRIPTION, description);
         cvTask.put(DATE, date);
-        db.insert(TASKS, null, cvTask);
+        return db.insert(TASKS, null, cvTask);
+
+//        return this.getWritableDatabase().query(TASKS,
+//                new String[] {NAME, DESCRIPTION, COLUMN_ID},
+//                "name = ? AND description = ? AND columnId = ?",
+//                new String[] {name, description, String.valueOf(columnId)},
+//                null, null, null);
     }
 
     public void updateNameInColumns(String newColumnName, String prevColumnName) {
