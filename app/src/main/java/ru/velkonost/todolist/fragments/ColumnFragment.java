@@ -24,6 +24,7 @@ import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.TimePicker;
 
 import java.text.ParseException;
@@ -41,11 +42,14 @@ import ru.velkonost.todolist.managers.DBHelper;
 import ru.velkonost.todolist.models.Task;
 
 import static ru.velkonost.todolist.Constants.COLUMN_ID;
+import static ru.velkonost.todolist.Constants.CONTENT_TEXT;
+import static ru.velkonost.todolist.Constants.CONTENT_TITLE;
 import static ru.velkonost.todolist.Constants.DESCRIPTION;
 import static ru.velkonost.todolist.Constants.DONE;
 import static ru.velkonost.todolist.Constants.ID;
 import static ru.velkonost.todolist.Constants.LOG_TAG;
 import static ru.velkonost.todolist.Constants.NAME;
+import static ru.velkonost.todolist.Constants.TICKER;
 
 public class ColumnFragment extends BaseTabFragment {
 
@@ -109,14 +113,11 @@ public class ColumnFragment extends BaseTabFragment {
                 inputDesc.setHint(getResources().getString(R.string.enter_task_description));
                 layout.addView(inputDesc);
 
-                final EditText inputDate = new EditText(context);
+                final TextView inputDate = new TextView(context);
+                inputDate.setPadding(dp2px(10), dp2px(10), dp2px(10), dp2px(10));
+                inputDate.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
                 inputDate.setLayoutParams(params);
                 inputDate.setHint(getResources().getString(R.string.enter_task_description));
-
-                final EditText inputTime = new EditText(context);
-                inputTime.setLayoutParams(params);
-                inputTime.setHint(getResources().getString(R.string.enter_task_description));
-
 
                 /**
                  * Использует для получения даты.
@@ -164,23 +165,20 @@ public class ColumnFragment extends BaseTabFragment {
                                 date[0] = date[0].substring(0, 10);
 
                                 if (minute < 10 && hourOfDay < 10) {
-                                    date[0] += " 0" + hourOfDay + " 0" + minute;
-                                    inputTime.setText("0" + hourOfDay + ":0" + minute);
+                                    date[0] += " 0" + hourOfDay + ":0" + minute;
                                 } else if (minute < 10) {
-                                    date[0] += " " + hourOfDay + " 0" + minute;
-                                    inputTime.setText(hourOfDay + ":0" + minute);
+                                    date[0] += " " + hourOfDay + ":0" + minute;
                                 } else if (hourOfDay < 10) {
-                                    date[0] += " 0" + hourOfDay + " " + minute;
-                                    inputTime.setText("0" + hourOfDay + ":" + minute);
+                                    date[0] += " 0" + hourOfDay + ":" + minute;
                                 } else {
-                                    date[0] += " " + hourOfDay + " " + minute;
-                                    inputTime.setText(hourOfDay + ":" + minute);
+                                    date[0] += " " + hourOfDay + ":" + minute;
                                 }
+                                inputDate.setText(date[0]);
                             }
                         }, mHour, mMinute, false);
 
+                timePicker.setCancelable(false);
                 layout.addView(inputDate);
-                layout.addView(inputTime);
 
                 inputDate.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -205,28 +203,30 @@ public class ColumnFragment extends BaseTabFragment {
 
                                 if (cardName.length() != 0) {
 
-                                    SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH mm");
+                                    SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm");
                                     long timeInMilliseconds = 0;
 
                                     try {
                                         Date mDate = sdf.parse(date[0]);
                                         timeInMilliseconds = mDate.getTime();
-                                        Log.i("KEKE", String.valueOf(Calendar.getInstance().getTimeInMillis()));
-                                        Log.i("KEKE", String.valueOf(timeInMilliseconds));
                                     } catch (ParseException e) {
                                         e.printStackTrace();
                                     }
 
                                     AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
                                     Intent intentNotification = new Intent(context, RebootService.class);
+
+                                    intentNotification.putExtra(TICKER, "To do list: " + cardName);
+                                    intentNotification.putExtra(CONTENT_TITLE, "Задача: " + cardName);
+                                    intentNotification.putExtra(CONTENT_TEXT, cardDescription);
+
                                     PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0,
-                                            intentNotification, PendingIntent.FLAG_CANCEL_CURRENT);
+                                            intentNotification, PendingIntent.FLAG_UPDATE_CURRENT);
+
                                     am.set(AlarmManager.RTC_WAKEUP, timeInMilliseconds, pendingIntent);
 
-
-
                                     dbHelper = new DBHelper(context);
-                                    dbHelper.insertInTask(cardName, cardDescription, columnId);
+                                    dbHelper.insertInTask(cardName, cardDescription, columnId, timeInMilliseconds);
                                     dbHelper.close();
 
                                     Intent intent = new Intent(context,
@@ -246,7 +246,6 @@ public class ColumnFragment extends BaseTabFragment {
                                 dialog.cancel();
                             }
                         });
-
 
                 AlertDialog alert = builder.create();
                 alert.show();

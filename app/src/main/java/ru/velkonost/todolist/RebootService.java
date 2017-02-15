@@ -9,6 +9,10 @@ import android.content.Intent;
 
 import java.util.Calendar;
 
+import static ru.velkonost.todolist.Constants.CONTENT_TEXT;
+import static ru.velkonost.todolist.Constants.CONTENT_TITLE;
+import static ru.velkonost.todolist.Constants.TICKER;
+
 public class RebootService extends BroadcastReceiver {
 
     Notification myNotication;
@@ -18,8 +22,13 @@ public class RebootService extends BroadcastReceiver {
 //
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intentNotification = new Intent(context, TimeNotification.class);
+
+        intentNotification.putExtra(TICKER, intent.getStringExtra(TICKER));
+        intentNotification.putExtra(CONTENT_TITLE, intent.getStringExtra(CONTENT_TITLE));
+        intentNotification.putExtra(CONTENT_TEXT, intent.getStringExtra(CONTENT_TEXT));
+
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0,
-                intentNotification, PendingIntent.FLAG_CANCEL_CURRENT);
+                intentNotification, PendingIntent.FLAG_UPDATE_CURRENT);
         am.set(AlarmManager.RTC_WAKEUP, Calendar.getInstance().getTimeInMillis() + 1000, pendingIntent);
 
 //        NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);

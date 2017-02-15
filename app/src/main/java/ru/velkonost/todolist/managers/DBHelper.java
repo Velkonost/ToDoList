@@ -10,6 +10,7 @@ import android.util.Log;
 import ru.velkonost.todolist.R;
 
 import static ru.velkonost.todolist.Constants.COLUMN_ID;
+import static ru.velkonost.todolist.Constants.DATE;
 import static ru.velkonost.todolist.Constants.DESCRIPTION;
 import static ru.velkonost.todolist.Constants.DONE;
 import static ru.velkonost.todolist.Constants.ID;
@@ -41,7 +42,8 @@ public class DBHelper extends SQLiteOpenHelper {
                 + "columnId integer,"
                 + "name text,"
                 + "description text,"
-                + "done integer" + ");");
+                + "done integer,"
+                + "date integer"+ ");");
 
     }
 
@@ -57,13 +59,14 @@ public class DBHelper extends SQLiteOpenHelper {
 
     }
 
-    public void insertInTask(String name, String description, int columnId) {
+    public void insertInTask(String name, String description, int columnId, long date) {
         ContentValues cvTask = new ContentValues();
         SQLiteDatabase db = this.getWritableDatabase();
         cvTask.put(NAME, name);
         cvTask.put(COLUMN_ID, columnId);
         cvTask.put(DONE, 0);
         cvTask.put(DESCRIPTION, description);
+        cvTask.put(DATE, date);
         db.insert(TASKS, null, cvTask);
     }
 
