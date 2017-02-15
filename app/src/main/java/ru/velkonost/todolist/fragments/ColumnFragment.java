@@ -94,6 +94,11 @@ public class ColumnFragment extends BaseTabFragment {
                 LinearLayout layout = new LinearLayout(context);
                 layout.setOrientation(LinearLayout.VERTICAL);
 
+                /**
+                 * Использует для получения даты.
+                 */
+                Calendar newCalendar = Calendar.getInstance();
+
                 LinearLayout.LayoutParams  params =
                         new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                                 ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -117,20 +122,14 @@ public class ColumnFragment extends BaseTabFragment {
                 inputDate.setPadding(dp2px(10), dp2px(10), dp2px(10), dp2px(10));
                 inputDate.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
                 inputDate.setLayoutParams(params);
-                inputDate.setHint(getResources().getString(R.string.enter_task_description));
+                inputDate.setHint(getResources().getString(R.string.enter_task_date));
 
-                /**
-                 * Использует для получения даты.
-                 */
-                Calendar newCalendar = Calendar.getInstance();
 
                 /**
                  * Требуется для дальнейшего преобразования даты в строку.
                  */
                 @SuppressLint("SimpleDateFormat") final SimpleDateFormat dateFormat
                         = new SimpleDateFormat("dd-MM-yyyy");
-
-
                 final String[] date = {""};
 
                 /**

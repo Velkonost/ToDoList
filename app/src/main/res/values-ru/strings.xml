@@ -17,6 +17,7 @@
     <string name="enter_column_name">Введите название…</string>
     <string name="enter_task_name">Введите название…</string>
     <string name="enter_task_description">Введите описание…</string>
+    <string name="enter_task_date">Укажите дату…</string>
 
     <string name="task_example_name">Ознакомиться с приложением</string>
     <string name="column_example_name">To do</string>

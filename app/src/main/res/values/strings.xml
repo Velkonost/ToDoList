@@ -15,6 +15,8 @@
     <string name="enter_column_name">Enter name…</string>
     <string name="enter_task_name">Enter name…</string>
     <string name="enter_task_description">Enter description…</string>
+    <string name="enter_task_date">Enter date…</string>
+
 
     <string name="task_example_name">Acquainted with the application</string>
     <string name="column_example_name">To do</string>
