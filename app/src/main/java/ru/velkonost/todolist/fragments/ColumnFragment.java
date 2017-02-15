@@ -1,5 +1,10 @@
 package ru.velkonost.todolist.fragments;
 
+import android.annotation.SuppressLint;
+import android.app.AlarmManager;
+import android.app.DatePickerDialog;
+import android.app.PendingIntent;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -16,13 +21,20 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TimePicker;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import ru.velkonost.todolist.R;
+import ru.velkonost.todolist.TimeNotification;
 import ru.velkonost.todolist.activities.MainActivity;
 import ru.velkonost.todolist.adapters.TaskListAdapter;
 import ru.velkonost.todolist.managers.DBHelper;
@@ -37,16 +49,16 @@ import static ru.velkonost.todolist.Constants.NAME;
 
 public class ColumnFragment extends BaseTabFragment {
 
-    private static final int LAYOUT = R.layout.fragment_column;
-
     private int columnId;
-
     private String cardName;
     private String cardDescription;
 
-
     private List<Task> data;
     private ArrayList<String> cids;
+
+    private DatePickerDialog datePicker;
+
+    private int mYear, mMonth, mDay, mHour, mMinute;
 
     private DBHelper dbHelper;
 
@@ -66,7 +78,7 @@ public class ColumnFragment extends BaseTabFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
-        view = inflater.inflate(LAYOUT, container, false);
+        view = inflater.inflate(R.layout.fragment_column, container, false);
 
         data = new ArrayList<>();
         cids = new ArrayList<>();
@@ -88,17 +100,95 @@ public class ColumnFragment extends BaseTabFragment {
 
                 final EditText inputName = new EditText(context);
                 inputName.setLayoutParams(params);
-
                 inputName.setHint(getResources().getString(R.string.enter_task_name));
                 inputName.setInputType(InputType.TYPE_CLASS_TEXT);
                 layout.addView(inputName);
 
                 final EditText inputDesc = new EditText(context);
                 inputDesc.setLayoutParams(params);
-
                 inputDesc.setHint(getResources().getString(R.string.enter_task_description));
                 layout.addView(inputDesc);
 
+                final EditText inputDate = new EditText(context);
+                inputDate.setLayoutParams(params);
+                inputDate.setHint(getResources().getString(R.string.enter_task_description));
+
+                final EditText inputTime = new EditText(context);
+                inputTime.setLayoutParams(params);
+                inputTime.setHint(getResources().getString(R.string.enter_task_description));
+
+
+                /**
+                 * Использует для получения даты.
+                 */
+                Calendar newCalendar = Calendar.getInstance();
+
+                /**
+                 * Требуется для дальнейшего преобразования даты в строку.
+                 */
+                @SuppressLint("SimpleDateFormat") final SimpleDateFormat dateFormat
+                        = new SimpleDateFormat("dd-MM-yyyy");
+
+
+                final String[] date = {""};
+
+                /**
+                 * Создает объект и инициализирует обработчиком события выбора даты и данными для даты по умолчанию.
+                 */
+                datePicker = new DatePickerDialog(context, new DatePickerDialog.OnDateSetListener() {
+                    // функция onDateSet обрабатывает шаг 2: отображает выбранные нами данные в элементе EditText
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                        Calendar newCal = Calendar.getInstance();
+                        newCal.set(year, monthOfYear, dayOfMonth);
+
+                        date[0] = "";
+                        date[0] += dateFormat.format(newCal.getTime());
+                        inputDate.setText(dateFormat.format(newCal.getTime()));
+                    }
+                },
+                        newCalendar.get(Calendar.YEAR),
+                        newCalendar.get(Calendar.MONTH),
+                        newCalendar.get(Calendar.DAY_OF_MONTH));
+
+                mHour = newCalendar.get(Calendar.HOUR_OF_DAY);
+                mMinute = newCalendar.get(Calendar.MINUTE);
+
+                final TimePickerDialog timePicker = new TimePickerDialog(context,
+                        new TimePickerDialog.OnTimeSetListener() {
+
+                            @Override
+                            public void onTimeSet(TimePicker view, int hourOfDay,
+                                                  int minute) {
+
+                                date[0] = date[0].substring(0, 10);
+
+                                if (minute < 10) {
+                                    date[0] += " 0" + hourOfDay + " 0" + minute;
+                                    inputTime.setText("0" + hourOfDay + ":0" + minute);
+                                } else {
+                                    date[0] += " " + hourOfDay + " " + minute;
+                                    inputTime.setText(hourOfDay + ":" + minute);
+                                }
+                            }
+                        }, mHour, mMinute, false);
+
+                layout.addView(inputDate);
+                layout.addView(inputTime);
+
+                inputDate.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        datePicker.show();
+                    }
+                });
+
+                datePicker.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialogInterface) {
+                        timePicker.show();
+                    }
+                });
 
                 builder.setView(layout)
                         .setPositiveButton(getResources().getString(R.string.ok), new DialogInterface.OnClickListener() {
@@ -108,6 +198,26 @@ public class ColumnFragment extends BaseTabFragment {
                                 cardDescription = inputDesc.getText().toString();
 
                                 if (cardName.length() != 0) {
+
+                                    SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH mm");
+                                    long timeInMilliseconds = 0;
+
+                                    try {
+                                        Date mDate = sdf.parse(date[0]);
+                                        timeInMilliseconds = mDate.getTime();
+                                        Log.i("KEKE", String.valueOf(Calendar.getInstance().getTimeInMillis()));
+                                        Log.i("KEKE", String.valueOf(timeInMilliseconds));
+                                    } catch (ParseException e) {
+                                        e.printStackTrace();
+                                    }
+
+                                    AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+                                    Intent intentNotification = new Intent(context, TimeNotification.class);
+                                    PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0,
+                                            intentNotification, PendingIntent.FLAG_CANCEL_CURRENT);
+                                    am.set(AlarmManager.RTC_WAKEUP, timeInMilliseconds, pendingIntent);
+
+
 
                                     dbHelper = new DBHelper(context);
                                     dbHelper.insertInTask(cardName, cardDescription, columnId);
@@ -171,6 +281,41 @@ public class ColumnFragment extends BaseTabFragment {
 
         return view;
     }
+
+    public void chooseDate(View w){
+        datePicker.show();
+    }
+
+
+//    private void initDateBirthdayDatePicker(){
+//        /**
+//         * Использует для получения даты.
+//         */
+//        Calendar newCalendar = Calendar.getInstance();
+//
+//        /**
+//         * Требуется для дальнейшего преобразования даты в строку.
+//         */
+//        @SuppressLint("SimpleDateFormat") final SimpleDateFormat dateFormat
+//                = new SimpleDateFormat("dd-MM-yyyy");
+//
+//        /**
+//         * Создает объект и инициализирует обработчиком события выбора даты и данными для даты по умолчанию.
+//         */
+//        datePicker = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
+//            // функция onDateSet обрабатывает шаг 2: отображает выбранные нами данные в элементе EditText
+//            @Override
+//            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+//                Calendar newCal = Calendar.getInstance();
+//                newCal.set(year, monthOfYear, dayOfMonth);
+//                editBirthday.setText(dateFormat.format(newCal.getTime()));
+//            }
+//        },
+//                newCalendar.get(Calendar.YEAR),
+//                newCalendar.get(Calendar.MONTH),
+//                newCalendar.get(Calendar.DAY_OF_MONTH));
+//    }
+
 
     private int dp2px(int dp) {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,

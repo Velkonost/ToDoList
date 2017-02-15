@@ -21,6 +21,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import ru.velkonost.todolist.R;
 import ru.velkonost.todolist.managers.DBHelper;
 
@@ -33,28 +35,36 @@ import static ru.velkonost.todolist.activities.MainActivity.initToolbar;
 
 public class TaskActivity extends AppCompatActivity {
 
-    private Toolbar toolbar;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+
+    @BindView(R.id.taskDescription)
+    TextView viewDescription;
+
+    @BindView(R.id.isDoneText)
+    TextView isDoneText;
+
+    @BindView(R.id.editCardName)
+    EditText editCardName;
+
+    @BindView(R.id.switcherBoardDescription)
+    ViewSwitcher switcher;
+
+    @BindView(R.id.editTaskDescription)
+    EditText mEditText;
 
     private DBHelper dbHelper;
 
     private int taskId;
 
-    private TextView viewDescription;
-
     private String name = "";
+
     private String description = "";
+
     private boolean isDone;
-
-    private TextView isDoneText;
-
     private Menu menu;
 
-    private EditText editCardName;
-
-    private ViewSwitcher switcher;
     private String text;
-
-    private EditText mEditText;
 
 
 
@@ -62,13 +72,9 @@ public class TaskActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_task);
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        viewDescription = (TextView) findViewById(R.id.taskDescription);
-        isDoneText = (TextView) findViewById(R.id.isDoneText);
-        editCardName = (EditText) findViewById(R.id.editCardName);
+        ButterKnife.bind(this);
 
         dbHelper = new DBHelper(this);
         Intent intent = getIntent();
@@ -88,7 +94,7 @@ public class TaskActivity extends AppCompatActivity {
 
             if (description == null) description = " ";
 
-        } else Log.d(LOG_TAG, "0 rows");
+        } else Log.d(LOG_TAG, getResources().getString(R.string.zero_rows));
 
         initToolbar(TaskActivity.this, toolbar, name);
         viewDescription.setText(description);
@@ -102,8 +108,6 @@ public class TaskActivity extends AppCompatActivity {
             isDoneText.setTextColor(getResources().getColor(R.color.colorRed));
         }
 
-
-
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -112,20 +116,14 @@ public class TaskActivity extends AppCompatActivity {
             }
         });
 
-
-        switcher = (ViewSwitcher) findViewById(R.id.switcherBoardDescription);
-        mEditText = (EditText) findViewById(R.id.editTaskDescription);
-
-        ((TextView) findViewById(R.id.taskDescription))
-                .setText(
+        viewDescription.setText(
                         Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
                                 ? Html.fromHtml(description,
                                 Html.FROM_HTML_MODE_LEGACY)
                                 : Html.fromHtml(description)
                 );
 
-        ((EditText) findViewById(R.id.editTaskDescription))
-                .setText(
+        mEditText.setText(
                         Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
                                 ? Html.fromHtml(description,
                                 Html.FROM_HTML_MODE_LEGACY)
@@ -199,7 +197,6 @@ public class TaskActivity extends AppCompatActivity {
                 AlertDialog.Builder builder = new AlertDialog.Builder(TaskActivity.this);
                 builder.setTitle(getResources().getString(R.string.delete_task))
                         .setMessage(getResources().getString(R.string.are_you_sure))
-//                .setIcon(R.drawable.ic_android_cat) МОЖНО ДОБАВИТЬ ИКОНКУ!
                         .setCancelable(false)
                         .setNegativeButton(getResources().getString(R.string.no),
                                 new DialogInterface.OnClickListener() {

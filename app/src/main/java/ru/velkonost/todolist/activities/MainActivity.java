@@ -16,6 +16,8 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import ru.velkonost.todolist.R;
 import ru.velkonost.todolist.fragments.ColumnsTabsFragmentAdapter;
 import ru.velkonost.todolist.managers.DBHelper;
@@ -27,28 +29,27 @@ import static ru.velkonost.todolist.managers.PhoneDataStorage.saveText;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ViewPager viewPager;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
 
-    private Toolbar toolbar;
+    @BindView(R.id.viewPagerColumns)
+    ViewPager viewPager;
 
-    private TabLayout tabLayout;
+    @BindView(R.id.tabLayout)
+    TabLayout tabLayout;
 
     private DBHelper dbHelper;
-
     private String columnName;
-
     private String currentColumnName;
     private String prevCurrentColumnName;
 
-    private int currentColumnPosition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main);
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        ButterKnife.bind(this);
 
         dbHelper = new DBHelper(this);
 
@@ -73,13 +74,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initTabs() {
-        viewPager = (ViewPager) findViewById(R.id.viewPagerColumns);
         final ColumnsTabsFragmentAdapter adapter
                 = new ColumnsTabsFragmentAdapter(this, getSupportFragmentManager());
 
         viewPager.setAdapter(adapter);
-
-        tabLayout = (TabLayout) findViewById(R.id.tabLayout);
 
         tabLayout.setupWithViewPager(viewPager);
 
@@ -155,7 +153,6 @@ public class MainActivity extends AppCompatActivity {
             case 0:
 
                 currentColumnName = tabLayout.getTabAt(viewPager.getCurrentItem()).getText().toString();
-                currentColumnPosition = viewPager.getCurrentItem() + 1;
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setTitle(getResources().getString(R.string.change_column_name));
@@ -222,5 +219,4 @@ public class MainActivity extends AppCompatActivity {
 
         activity.setSupportActionBar(toolbar);
     }
-
 }

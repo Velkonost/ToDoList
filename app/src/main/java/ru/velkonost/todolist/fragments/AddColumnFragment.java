@@ -12,8 +12,6 @@ import ru.velkonost.todolist.R;
 
 public class AddColumnFragment extends BaseTabFragment {
 
-    private static final int LAYOUT = R.layout.fragment_add_column;
-
     public static AddColumnFragment getInstance(Context context) {
         Bundle args = new Bundle();
         AddColumnFragment fragment = new AddColumnFragment();
@@ -28,7 +26,7 @@ public class AddColumnFragment extends BaseTabFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        view = inflater.inflate(LAYOUT, container, false);
+        view = inflater.inflate(R.layout.fragment_add_column, container, false);
 
         return view;
     }
