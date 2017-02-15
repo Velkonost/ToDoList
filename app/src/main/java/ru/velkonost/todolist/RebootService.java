@@ -10,12 +10,18 @@ import android.os.Vibrator;
 
 import ru.velkonost.todolist.activities.MainActivity;
 
-public class TimeNotification extends BroadcastReceiver {
+public class RebootService extends BroadcastReceiver {
 
     Notification myNotication;
 
     @Override
     public void onReceive(Context context, Intent intent) {
+//
+//        AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+//        Intent intentNotification = new Intent(context, TimeNotification.class);
+//        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0,
+//                intentNotification, PendingIntent.FLAG_CANCEL_CURRENT);
+//        am.set(AlarmManager.RTC_WAKEUP, Calendar.getInstance().getTimeInMillis() + 1000, pendingIntent);
 
         NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         //Интент для активити, которую мы хотим запускать при нажатии на уведомление
@@ -40,6 +46,4 @@ public class TimeNotification extends BroadcastReceiver {
         nm.notify(11, myNotication);
 
     }
-
-
 }

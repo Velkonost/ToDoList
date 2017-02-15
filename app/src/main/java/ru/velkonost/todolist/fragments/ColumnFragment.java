@@ -34,7 +34,7 @@ import java.util.Date;
 import java.util.List;
 
 import ru.velkonost.todolist.R;
-import ru.velkonost.todolist.TimeNotification;
+import ru.velkonost.todolist.RebootService;
 import ru.velkonost.todolist.activities.MainActivity;
 import ru.velkonost.todolist.adapters.TaskListAdapter;
 import ru.velkonost.todolist.managers.DBHelper;
@@ -163,9 +163,15 @@ public class ColumnFragment extends BaseTabFragment {
 
                                 date[0] = date[0].substring(0, 10);
 
-                                if (minute < 10) {
+                                if (minute < 10 && hourOfDay < 10) {
                                     date[0] += " 0" + hourOfDay + " 0" + minute;
                                     inputTime.setText("0" + hourOfDay + ":0" + minute);
+                                } else if (minute < 10) {
+                                    date[0] += " " + hourOfDay + " 0" + minute;
+                                    inputTime.setText(hourOfDay + ":0" + minute);
+                                } else if (hourOfDay < 10) {
+                                    date[0] += " 0" + hourOfDay + " " + minute;
+                                    inputTime.setText("0" + hourOfDay + ":" + minute);
                                 } else {
                                     date[0] += " " + hourOfDay + " " + minute;
                                     inputTime.setText(hourOfDay + ":" + minute);
@@ -212,7 +218,7 @@ public class ColumnFragment extends BaseTabFragment {
                                     }
 
                                     AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-                                    Intent intentNotification = new Intent(context, TimeNotification.class);
+                                    Intent intentNotification = new Intent(context, RebootService.class);
                                     PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0,
                                             intentNotification, PendingIntent.FLAG_CANCEL_CURRENT);
                                     am.set(AlarmManager.RTC_WAKEUP, timeInMilliseconds, pendingIntent);
