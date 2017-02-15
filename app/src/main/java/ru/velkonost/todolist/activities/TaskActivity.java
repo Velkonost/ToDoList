@@ -78,7 +78,6 @@ public class TaskActivity extends AppCompatActivity {
 
         dbHelper = new DBHelper(this);
         Intent intent = getIntent();
-        Log.i("KEKE", String.valueOf(intent.getIntExtra(ID, 0)));
         taskId = intent.getIntExtra(ID, 0);
 
         Cursor c = dbHelper.queryByIdInTasks(taskId);

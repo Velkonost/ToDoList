@@ -220,20 +220,6 @@ public class ColumnFragment extends BaseTabFragment {
                                     dbHelper = new DBHelper(context);
                                     String newTaskId = String.valueOf(dbHelper.insertInTask(cardName, cardDescription, columnId, timeInMilliseconds));
 
-//                                    String newTaskId = null;
-//
-//                                    if (cursor.moveToFirst()) {
-//
-//                                        int idTaskIndex = cursor.getColumnIndex(ID);
-//
-//                                        newTaskId = cursor.getString(idTaskIndex);
-//
-//                                    } else Log.d(LOG_TAG, getResources().getString(R.string.zero_rows));
-//
-//                                    dbHelper.close();
-
-                                    Log.i("KEKE", String.valueOf(newTaskId));
-
                                     AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
                                     Intent intentNotification = new Intent(context, RebootService.class);
 
