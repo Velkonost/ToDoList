@@ -102,7 +102,7 @@ public class ColumnFragment extends BaseTabFragment {
                 LinearLayout.LayoutParams  params =
                         new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                                 ViewGroup.LayoutParams.WRAP_CONTENT);
-                params.setMargins(0, dp2px(20), 0, dp2px(20));
+                params.setMargins(dp2px(20), dp2px(20), dp2px(20), dp2px(20));
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setTitle(getResources().getString(R.string.add_task));
@@ -118,10 +118,15 @@ public class ColumnFragment extends BaseTabFragment {
                 inputDesc.setHint(getResources().getString(R.string.enter_task_description));
                 layout.addView(inputDesc);
 
+                LinearLayout.LayoutParams  paramsDate =
+                        new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                                ViewGroup.LayoutParams.WRAP_CONTENT);
+                paramsDate.setMargins(dp2px(25), dp2px(20), dp2px(20), dp2px(20));
+
                 final TextView inputDate = new TextView(context);
-                inputDate.setPadding(dp2px(10), dp2px(10), dp2px(10), dp2px(10));
-                inputDate.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-                inputDate.setLayoutParams(params);
+                inputDate.setTextSize(16);
+//                inputDate.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+                inputDate.setLayoutParams(paramsDate);
                 inputDate.setHint(getResources().getString(R.string.enter_task_date));
 
 
