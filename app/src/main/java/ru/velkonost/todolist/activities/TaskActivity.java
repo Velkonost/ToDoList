@@ -129,8 +129,6 @@ public class TaskActivity extends AppCompatActivity {
                                 Html.FROM_HTML_MODE_LEGACY)
                                 : Html.fromHtml(description)
                 );
-
-
     }
 
     @Override

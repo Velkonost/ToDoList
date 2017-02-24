@@ -35,7 +35,7 @@ import java.util.Date;
 import java.util.List;
 
 import ru.velkonost.todolist.R;
-import ru.velkonost.todolist.RebootService;
+import ru.velkonost.todolist.alarm.RebootService;
 import ru.velkonost.todolist.activities.MainActivity;
 import ru.velkonost.todolist.adapters.TaskListAdapter;
 import ru.velkonost.todolist.managers.DBHelper;
@@ -218,7 +218,9 @@ public class ColumnFragment extends BaseTabFragment {
                                     }
 
                                     dbHelper = new DBHelper(context);
-                                    String newTaskId = String.valueOf(dbHelper.insertInTask(cardName, cardDescription, columnId, timeInMilliseconds));
+                                    String newTaskId = String.valueOf(dbHelper.insertInTask(cardName,
+                                            cardDescription, columnId,
+                                            timeInMilliseconds));
 
                                     AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
                                     Intent intentNotification = new Intent(context, RebootService.class);

@@ -24,16 +24,19 @@
         <activity android:name=".activities.TaskActivity"/>
 
 
-
-        <receiver android:name=".TimeNotification"
+        <receiver android:name=".alarm.AlarmSetter" android:enabled="true"
                   android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
             <intent-filter>
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="ANDROID.INTENT.ACTION.BOOT_COMPLETED"/>
                 <action android:name="android.intent.action._BOOT_COMPLETED"/>
-                <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".RebootService"
+        <receiver android:name=".alarm.RebootService"
+                  android:enabled="true"
+                  android:exported="true"
                   android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
             <intent-filter>
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
@@ -42,6 +45,7 @@
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </receiver>
+
     </application>
 
 </manifest>

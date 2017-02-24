@@ -67,6 +67,7 @@ public class DBHelper extends SQLiteOpenHelper {
         cvTask.put(DONE, 0);
         cvTask.put(DESCRIPTION, description);
         cvTask.put(DATE, date);
+
         return db.insert(TASKS, null, cvTask);
 
 //        return this.getWritableDatabase().query(TASKS,
@@ -75,6 +76,7 @@ public class DBHelper extends SQLiteOpenHelper {
 //                new String[] {name, description, String.valueOf(columnId)},
 //                null, null, null);
     }
+
 
     public void updateNameInColumns(String newColumnName, String prevColumnName) {
         ContentValues cv = new ContentValues();
@@ -107,6 +109,12 @@ public class DBHelper extends SQLiteOpenHelper {
         db.delete(TASKS,
                 "id = ?",
                 new String[] {String.valueOf(taskId)});
+    }
+
+    public Cursor queryAllTaskDate() {
+        return this.getWritableDatabase().query(TASKS,
+                new String[] {"date"},
+                null, null, null, null, null);
     }
 
     public Cursor queryByIdInTasks(int taskId) {
