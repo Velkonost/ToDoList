@@ -28,6 +28,10 @@ public class AlarmSetter extends BroadcastReceiver {
 
         Log.i(LOG_TAG, "reboot alarm received");
 
+
+        /// Данный кусок кода проверял в MainActivity.onCreate() - все работало
+
+
         DBHelper dbHelper = new DBHelper(context);
 
         Cursor cr = dbHelper.queryInTasks();
@@ -59,6 +63,8 @@ public class AlarmSetter extends BroadcastReceiver {
 
         cr.close();
         dbHelper.close();
+
+        ///
 
     }
 }
